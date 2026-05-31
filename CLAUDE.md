@@ -22,7 +22,6 @@ layout, as in nicobailon/visual-explainer):
 
 ```
 .claude-plugin/                 plugin.json + marketplace.json (install manifests)
-docs/plans/                     implementation plans
 skills/
   software-visual-explainer/
     SKILL.md                    lean orchestrator
