@@ -47,7 +47,8 @@ exclusions — see `references/content-shape.md`.
    the doc. (Brainstorm mode: verify only *existing-code* references; proposed code gets the
    `proposed` badge instead.)
 3. **Pick the syntax-highlighting language(s).** Detect from the repo's file extensions, or ask. The
-   build highlights offline via Shiki — see `references/diagrams-and-code.md`.
+   template loads Prism from CDN — replace `{{LANGUAGE}}` in its `<script>` tag (duplicate the line
+   for multiple languages). See `references/diagrams-and-code.md`.
 4. **Draft from `templates/template.html`.** Replace placeholders; preserve the locked palette, fonts,
    and component styles. Structure per `references/content-shape.md`.
 5. **Self-review against the codebase.** Map every snippet, state name, and named entity back to a
@@ -67,21 +68,18 @@ This SKILL.md is the orchestrator. Detail lives in the reference files — read 
 | The pre-completion checklist (accuracy, build, a11y, print, brainstorm) | [`references/verification.md`](references/verification.md) |
 | The HTML skeleton to start from | `templates/template.html` |
 
-## Build (offline, self-contained output)
+## Rendering (CDN, no build)
 
-The template references the shared core via `<!-- @core:css -->` / `<!-- @core:js -->` markers, writes
-Mermaid as `.mermaid` blocks and code as `<pre><code class="language-X">`. After filling in content,
-run the build to inline the core, pre-render Mermaid to SVG, highlight code via Shiki, and strip CDN
-tags — the result opens with **no network**:
+`templates/template.html` is **fully self-contained**: it embeds the shared core and loads Mermaid +
+Prism from a CDN. There is **no build step**. Write `.mermaid` blocks and `<pre><code class="language-X">`,
+replace `{{LANGUAGE}}` in the Prism `<script>` tag with the language(s) used, and **open the file in a
+browser** — Mermaid renders the diagrams and Prism highlights the code. Nothing to install, no Node.
+(The page needs a network connection to reach the CDN; it is not offline-self-contained, by design.)
 
-    node "${CLAUDE_PLUGIN_ROOT}/skills/visual-explainer-core/scripts/build.mjs" path/to/your-explainer.html
-
-First run only: `npm install` once in `skills/visual-explainer-core/` (fetches a one-time headless
-Chromium). Full pipeline, deps, and troubleshooting:
-`visual-explainer-core/references/build-pipeline.md`.
-
-**Do not fork the palette.** All colors, fonts, and component styles live in `visual-explainer-core`;
-never redefine `:root` tokens in this template — add only software-specific components.
+**Do not fork the palette.** The template's `<style>`/`<script>` are an inline copy of
+`visual-explainer-core`'s `core.css`/`core.js`. Never hand-edit the theme in one template — change the
+canonical `core.css`/`core.js` and re-sync (see that skill). Add only software-specific components in
+the template's own `<style>` block.
 
 ## Output file location
 

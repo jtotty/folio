@@ -1,6 +1,33 @@
+// ---- Mermaid: render diagrams in the browser from CDN, with the locked theme ----
+// Guarded so an explainer without the Mermaid CDN tag still works. startOnLoad
+// renders every .mermaid block once the DOM is parsed.
+if (window.mermaid) {
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'base',
+    // Sequence diagrams: compact fonts + layout. Prefer `participant` over `actor`
+    // in the source — `actor` draws an oversized stick-figure glyph.
+    sequence: {
+      actorFontSize: 12, messageFontSize: 11, noteFontSize: 11,
+      actorMargin: 55, boxMargin: 8, mirrorActors: false
+    },
+    themeVariables: {
+      fontFamily: '"SF Mono", "JetBrains Mono", "IBM Plex Mono", Menlo, monospace',
+      fontSize: '13px',
+      primaryColor: '#e3ede9', primaryTextColor: '#1a1a1a', primaryBorderColor: '#2f5d50',
+      lineColor: '#8a8a8a', secondaryColor: '#f1ede4', tertiaryColor: '#ffffff',
+      noteBkgColor: '#fcecdc', noteTextColor: '#4a4a4a', noteBorderColor: '#e6e2d8',
+      clusterBkg: '#fafaf7', clusterBorder: '#e6e2d8'
+    }
+  });
+}
+
 document.addEventListener('DOMContentLoaded', function () {
 
-  // ---- Copy-to-clipboard buttons (moved verbatim) ----
+  // ---- Prism: highlight code in the browser from CDN (warm palette lives in core.css) ----
+  if (window.Prism) { Prism.highlightAll(); }
+
+  // ---- Copy-to-clipboard buttons ----
   document.querySelectorAll('.copy-btn').forEach(function (btn) {
     btn.addEventListener('click', function () {
       var text = btn.dataset.copyText;

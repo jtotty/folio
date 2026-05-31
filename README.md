@@ -53,12 +53,12 @@ visual walkthrough"*, or *"compare these 4 approaches side by side."*
   explanation they finish beats a 100% one they don't open.
 - **Real code, not pseudocode.** Snippets are verified against the source so the reader sees the exact
   symbols they'll find in the codebase.
-- **Self-contained output.** One fully offline HTML file. The build step pre-renders Mermaid diagrams to inline SVG, highlights code via Shiki inline, and inlines the shared core — no network required to open the result.
+- **Single-file output, no build.** One HTML file you just open in a browser — it embeds the shared theme and renders Mermaid diagrams + syntax-highlighted code from a CDN. Nothing to install.
 
 ## Shipped
 
-- Shared design system extracted to `skills/visual-explainer-core/` (CSS, JS, Shiki theme) — all skills inherit one identity with zero drift.
-- Offline-by-default build (`build.mjs`): Mermaid pre-rendered to inline SVG, code highlighted via Shiki inline, no CDN tags in the output.
+- Shared design system in `skills/visual-explainer-core/` (canonical `core.css` + `core.js`) — every skill embeds the same theme, so they can't drift.
+- Self-contained CDN templates: copy, fill in, open. Mermaid + Prism render in the browser with the locked theme — no build step, no Node.
 - Accessibility (WCAG-AA contrast, focus, keyboard), a print/Save-as-PDF stylesheet, and reading-first comprehension aids (scroll-spy, sidenotes, details-on-demand).
 
 ## Roadmap

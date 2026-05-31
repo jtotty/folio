@@ -14,16 +14,15 @@ state name is worse than a missing one.
 - Worked-example inputs and outputs are internally consistent and match the semantics described in the
   source.
 
-## Build & rendering
+## Rendering
 
-- Ran the build; the output opens correctly **with networking disabled** — diagrams are inline
-  `<svg>`, code is highlighted with distinct token colors, and no `cdnjs`/`jsdelivr`/`prism`
-  references remain. (Shiki emits `class="shiki warm-paper"` and uppercase hex like `#D6432E`; match
-  case-insensitively if you script the check.)
+- Open the file in a browser **with a network connection** — Mermaid renders every diagram and Prism
+  highlights every code block (both load from CDN).
+- Every Prism `{{LANGUAGE}}` placeholder has been replaced with a real language id; each code block
+  highlights in distinct token colors (not a single flat color). A flat block means that language's
+  Prism component isn't loaded — fix the `<script>` tag and the `language-X` id.
 - No gradients, no emojis, no CSS framework utility classes (Bootstrap, Tailwind) unless explicitly
   requested.
-- Code blocks highlight in distinct token colors (not a single flat color) — a flat block means the
-  language id fell back to plaintext; fix the `language-X` id.
 
 ## Accessibility & print
 

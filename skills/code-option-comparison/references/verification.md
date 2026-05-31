@@ -10,13 +10,12 @@ Run through this before declaring a comparison complete.
 - The comparison axes actually differentiate (if every option scores the same on an axis, drop the axis).
 - The recommendation states a preference with reasoning, framed as a starting point not a verdict.
 
-## Build & rendering
+## Rendering
 
-- Renders standalone in a browser: columns line up, the matrix is readable, copy buttons work.
-- Ran the build; the output opens correctly **with networking disabled** — diagrams are inline
-  `<svg>`, code is highlighted with distinct token colors, and no `cdnjs`/`jsdelivr`/`prism`
-  references remain. (Shiki emits `class="shiki warm-paper"` and uppercase hex like `#D6432E`; match
-  case-insensitively if you script the check.)
+- Open in a browser **with a network connection**: columns line up, the matrix is readable, copy
+  buttons work, Mermaid renders every diagram and Prism highlights every code block (both from CDN).
+- Every Prism `{{LANGUAGE}}` placeholder has been replaced; each code block highlights in distinct
+  token colors (not a single flat color).
 
 ## Accessibility & print
 

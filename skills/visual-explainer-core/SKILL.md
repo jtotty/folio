@@ -1,6 +1,6 @@
 ---
 name: visual-explainer-core
-description: Use when building or modifying any visual-explainer skill (software, article, finance, or new domains) that must share one consistent locked theme and produce offline self-contained HTML. The single source of truth for the explainer family's palette, typography, primitives, code highlighting, Mermaid theme, accessibility, print, and the build pipeline.
+description: Use when building or modifying any visual-explainer skill (software, article, finance, or new domains) that must share one consistent locked theme. The single source of truth for the explainer family's palette, typography, primitives, code highlighting, Mermaid theme, accessibility, and print — inherited by each skill's self-contained, CDN-rendered template.
 ---
 
 # Visual Explainer Core
@@ -15,30 +15,33 @@ theme variation.
 
 ## What lives here
 
-Files are grouped by role; `SKILL.md` + `package.json` stay at the root.
+`SKILL.md` at the root; the theme itself in `assets/`. There is **no build step** — diagrams and
+code render in the browser from a CDN.
 
 | Path | Responsibility |
 |---|---|
-| `assets/core.css` | All shared CSS: `:root` tokens, typography, primitives, code-token palette, a11y, print. |
-| `assets/core.js` | Copy buttons, tabs (+keyboard), sliders, TOC scroll-spy, back-to-top, diagram zoom. |
-| `assets/shiki-theme.json` | TextMate theme reproducing the warm code palette (inline-style highlighting). |
-| `config/mmdc-config.json` | Mermaid theme/sequence config (locked palette). |
-| `config/puppeteer-config.json` | `--no-sandbox` for headless Chromium. |
-| `scripts/build.mjs` | Inlines core, pre-renders Mermaid→SVG and code→Shiki, strips CDN. Offline output. |
-| `references/build-pipeline.md` | Full walkthrough of what the build does, its deps, and troubleshooting. |
+| `assets/core.css` | All shared CSS: `:root` tokens, typography, primitives, the Prism code-token palette, a11y, print. |
+| `assets/core.js` | Copy buttons, tabs (+keyboard), sliders, TOC scroll-spy, back-to-top, diagram zoom — plus the locked `mermaid.initialize` and `Prism.highlightAll`. |
 
 ## How a domain skill uses the core
 
-1. The domain `templates/template.html` puts `<!-- @core:css -->` in `<head>` and `<!-- @core:js -->`
-   before `</body>`, and adds only its own components in a small `<style>` block.
-2. Author fills in content; Mermaid as `.mermaid` blocks, code as `<pre><code class="language-X">`.
-3. Run the build to produce a self-contained offline artifact:
+Each domain `templates/template.html` is **fully self-contained**: it embeds an inline copy of
+`core.css` and `core.js`, and loads Mermaid + Prism from a CDN. To produce an explainer:
 
-       node "${CLAUDE_PLUGIN_ROOT}/skills/visual-explainer-core/scripts/build.mjs" <file.html>
+1. Start from `templates/template.html` (already self-contained — nothing to wire up).
+2. Fill in content: Mermaid as `.mermaid` blocks, code as `<pre><code class="language-X">`. Replace
+   `{{LANGUAGE}}` in the Prism `<script>` tag with the language(s) the document uses.
+3. **Open the file in a browser.** Mermaid renders the diagrams and Prism highlights the code, both
+   from CDN. Nothing to install — no Node, no build. (Output needs a network connection to reach the
+   CDN; it is not offline-self-contained, by design.)
 
-   Install deps once first: `npm install` in `skills/visual-explainer-core/` (fetches a one-time
-   headless Chromium). **What each build stage does, and how to debug it, is in
-   [`references/build-pipeline.md`](references/build-pipeline.md).**
+## Keeping the theme in sync (canonical core)
+
+`assets/core.css` and `assets/core.js` are the **single canonical copy** of the locked theme; each
+template embeds an inline copy. There is deliberately no build to stamp it in automatically, so the
+sync is manual: **when you change the theme, edit `core.css`/`core.js` here first, then paste the
+updated content into each template's `<style>` / `<script>` block.** Edit the canonical files, never
+a template's copy in isolation — that is exactly the drift this core exists to prevent.
 
 ## The locked palette (do not change)
 

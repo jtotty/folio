@@ -1,15 +1,15 @@
 # Diagrams and code
 
-How to render the technical content. Three diagram flavors, plus how code blocks become highlighted
-offline.
+How to render the technical content. Three diagram flavors, plus how code blocks get highlighted in
+the browser (Prism, from CDN).
 
 ## Diagrams
 
 Three flavors, used together as needed:
 
 1. **Mermaid** for state, flow, sequence, class, and ER diagrams. Always wrap the `.mermaid` block
-   inside a `.diagram` paper card. The build pre-renders it to inline SVG with the locked Mermaid
-   theme (`config/mmdc-config.json` in `visual-explainer-core`). Prefer:
+   inside a `.diagram` paper card. Mermaid loads from CDN and renders in the browser with the locked
+   theme (the `mermaid.initialize` config baked into `visual-explainer-core`'s `core.js`). Prefer:
    - `stateDiagram-v2` for state machines (AASM, XState, enum-based state fields).
    - `sequenceDiagram` for request/response flows, message-passing, async coordination.
    - `flowchart` for control flow, decision trees, pipeline stages.
@@ -17,8 +17,9 @@ Three flavors, used together as needed:
    - `classDiagram` for type hierarchies, inheritance, interface implementations.
 
    For `sequenceDiagram`, use `participant` rather than `actor` — `actor` draws an oversized
-   stick-figure glyph. The locked Mermaid config already ships compact sequence-diagram sizing (a
-   `sequence` config block plus font-size overrides). Keep diagrams within the node budget (see the
+   stick-figure glyph. The locked theme already ships compact sequence-diagram sizing (a `sequence`
+   config block in `core.js` plus `!important` font-size overrides in `core.css`). Keep diagrams
+   within the node budget (see the
    density rules in [`content-shape.md`](content-shape.md)); use `<br/>` (never `\n`) for label breaks.
 
 2. **Custom HTML module / class boxes** for "what lives where" diagrams — a dark prefixed entity tile
@@ -38,13 +39,13 @@ Three flavors, used together as needed:
   `python`, `typescript`, `javascript`, `jsx`, `tsx`, `go`, `rust`, `java`, `swift`, `kotlin`,
   `csharp`, `cpp`, `c`, `sql`, `bash`, `yaml`, `json`, `graphql`, `protobuf`, `erb`, `haml`, `elixir`,
   `clojure`, `scala`, `php`, etc.
-- The build's **Shiki** step highlights every block offline, emitting inline styles using the warm
-  token palette in `visual-explainer-core/assets/shiki-theme.json` (a TextMate theme — punchy red
-  keywords, amber strings, teal symbols, blue constants, purple numbers, orange builtins). There is
-  **no Prism, no CDN, and no runtime highlighting** — coloring is baked in at build time.
-- An alias map in the build handles ids that differ from Shiki's grammar names (e.g. `protobuf` →
-  `proto`). An unknown or unsupported id falls back to plain text — no error, just no token coloring.
-  (See `visual-explainer-core/references/build-pipeline.md` for the full highlighting stage.)
+- **Prism** (loaded from CDN) highlights every block in the browser, applying the warm token palette
+  defined in `visual-explainer-core/assets/core.css` (the `.token.*` rules — punchy red keywords,
+  amber strings, teal symbols, blue constants, purple numbers, orange builtins). `core.js` calls
+  `Prism.highlightAll()` on load.
+- The template's Prism `<script>` tag carries a `{{LANGUAGE}}` placeholder — replace it with the
+  language id (`ruby`, `python`, …), and duplicate the `<script>` line for each additional language.
+  A block whose language component isn't loaded simply renders unhighlighted — no error.
 
 **Use real code, not pseudocode.** The whole point of syntax highlighting is that the reader sees the
 exact symbols they'd find in the codebase. If a snippet needs trimming for the explainer, trim with

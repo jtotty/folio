@@ -29,13 +29,9 @@ skills/
     references/*.md             detail, loaded on demand
     templates/template.html
   code-option-comparison/       (same shape)
-  visual-explainer-core/        shared design system + build (not a user-facing generator)
+  visual-explainer-core/        shared design system (not a user-facing generator)
     SKILL.md
-    references/build-pipeline.md
-    assets/      core.css, core.js, shiki-theme.json
-    config/      mmdc-config.json, puppeteer-config.json
-    scripts/     build.mjs
-    package.json, package-lock.json
+    assets/      core.css, core.js   ← canonical locked theme
 ```
 
 **SKILL.md is an orchestrator, kept lean.** It carries when-to-use, the process spine, and a
@@ -43,21 +39,18 @@ reference map; everything else (content shapes, diagram/code detail, primitives,
 `references/*.md` and is pulled in only when needed. When adding guidance, put detail in a reference
 file and link it from SKILL.md — don't grow the always-loaded SKILL.md.
 
-## Shared core + offline build (shipped)
+## Shared core + CDN rendering (no build)
 
-The shared-core + offline-build refactor is complete. Shared assets live at
-`skills/visual-explainer-core/assets/` (`core.css`, `core.js`, `shiki-theme.json`). Skills reference
-the core via `<!-- @core:css -->` / `<!-- @core:js -->` markers in their `templates/template.html`.
+The locked theme lives once in `skills/visual-explainer-core/assets/` (`core.css`, `core.js`). Each
+domain `templates/template.html` is **fully self-contained**: it embeds an inline copy of that core
+and loads Mermaid + Prism from a CDN. There is **no build step** — fill in the template, replace
+`{{LANGUAGE}}` in the Prism `<script>` tag, and open the file in a browser. (CDN-dependent, so not
+offline; that's the deliberate trade for simplicity.)
 
-To produce a fully offline artifact, run:
-
-    node "${CLAUDE_PLUGIN_ROOT}/skills/visual-explainer-core/scripts/build.mjs" path/to/your-file.html
-
-(Outside an installed plugin, substitute the repo-relative path to `scripts/build.mjs`.) Run
-`npm install` once in `skills/visual-explainer-core/` first — this also fetches a one-time headless
-Chromium for Mermaid pre-rendering (~150–200 MB; set `PUPPETEER_EXECUTABLE_PATH` to reuse a system
-Chrome). What each build stage does is documented in
-`skills/visual-explainer-core/references/build-pipeline.md`.
+`core.css`/`core.js` are the **canonical** copy; the templates' inline copies must match them. When
+you change the theme, edit the canonical files first, then paste the update into each template's
+`<style>` / `<script>`. This manual sync is the one discipline that keeps the family consistent —
+there is deliberately no build to automate it.
 
 **`visual-explainer-core` is intentionally NOT listed in `.claude-plugin/plugin.json`'s `skills`
 array.** It is shared infrastructure and a contributor contract, not a user-facing explainer

@@ -56,21 +56,18 @@ This SKILL.md is the orchestrator. Detail lives in the reference files:
 | The pre-completion checklist (content, build, a11y, print) | [`references/verification.md`](references/verification.md) |
 | The HTML skeleton to start from | `templates/template.html` |
 
-## Build (offline, self-contained output)
+## Rendering (CDN, no build)
 
-The template references the shared core via `<!-- @core:css -->` / `<!-- @core:js -->` markers, writes
-Mermaid as `.mermaid` blocks and code as `<pre><code class="language-X">`. After filling in content,
-run the build to inline the core, pre-render Mermaid to SVG, highlight code via Shiki, and strip CDN
-tags — the result opens with **no network**:
+`templates/template.html` is **fully self-contained**: it embeds the shared core and loads Mermaid +
+Prism from a CDN. There is **no build step**. Write `.mermaid` blocks and `<pre><code class="language-X">`,
+replace `{{LANGUAGE}}` in the Prism `<script>` tag with the language(s) used, and **open the file in a
+browser** — Mermaid renders the diagrams and Prism highlights the code. Nothing to install, no Node.
+(The page needs a network connection to reach the CDN; it is not offline-self-contained.)
 
-    node "${CLAUDE_PLUGIN_ROOT}/skills/visual-explainer-core/scripts/build.mjs" path/to/your-comparison.html
-
-First run only: `npm install` once in `skills/visual-explainer-core/` (fetches a one-time headless
-Chromium). Full pipeline, deps, and troubleshooting:
-`visual-explainer-core/references/build-pipeline.md`.
-
-**Do not fork the palette.** All colors, fonts, and component styles live in `visual-explainer-core`;
-never redefine `:root` tokens in this template — add only comparison-specific components.
+**Do not fork the palette.** The template's `<style>`/`<script>` are an inline copy of
+`visual-explainer-core`'s `core.css`/`core.js`. Never hand-edit the theme in one template — change the
+canonical `core.css`/`core.js` and re-sync (see that skill). Add only comparison-specific components in
+the template's own `<style>` block.
 
 ## Output file location
 
