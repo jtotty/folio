@@ -1,0 +1,27 @@
+{
+  "name": "folio",
+  "description": "Turn dense docs — specs, RFCs, ADRs, codebase tours, option comparisons — into one calm, consistently-themed, self-contained HTML explainer. Software topics today; built to grow to finance and long-form articles.",
+  "version": "0.1.0",
+  "author": {
+    "name": "jtotty",
+    "url": "https://github.com/jtotty"
+  },
+  "homepage": "https://github.com/jtotty/folio",
+  "repository": "https://github.com/jtotty/folio",
+  "license": "MIT",
+  "keywords": [
+    "visual-explainer",
+    "explainer",
+    "claude-skill",
+    "agent-skill",
+    "html",
+    "diagrams",
+    "mermaid",
+    "documentation",
+    "infographic"
+  ],
+  "skills": [
+    "./skills/software-visual-explainer",
+    "./skills/code-option-comparison"
+  ]
+}

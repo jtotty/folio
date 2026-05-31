@@ -1,0 +1,15 @@
+{
+  "name": "jtotty",
+  "description": "jtotty's Claude Code plugins.",
+  "owner": {
+    "name": "jtotty",
+    "url": "https://github.com/jtotty"
+  },
+  "plugins": [
+    {
+      "name": "folio",
+      "source": "./",
+      "description": "Calm, consistent, self-contained HTML explainers for dense docs."
+    }
+  ]
+}
