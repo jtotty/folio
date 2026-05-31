@@ -17,25 +17,47 @@ project rejects. Consistency is the product.
 
 ## Layout
 
+Each skill keeps `SKILL.md` at its root and groups supporting files by role (the canonical skill
+layout, as in nicobailon/visual-explainer):
+
 ```
-.claude-plugin/   plugin.json + marketplace.json (install manifests)
-skills/           one folder per skill, each with SKILL.md
-docs/plans/       implementation plans (e.g. the shared-core + offline-build refactor)
+.claude-plugin/                 plugin.json + marketplace.json (install manifests)
+docs/plans/                     implementation plans
+skills/
+  software-visual-explainer/
+    SKILL.md                    lean orchestrator
+    references/*.md             detail, loaded on demand
+    templates/template.html
+  code-option-comparison/       (same shape)
+  visual-explainer-core/        shared design system + build (not a user-facing generator)
+    SKILL.md
+    references/build-pipeline.md
+    assets/      core.css, core.js, shiki-theme.json
+    config/      mmdc-config.json, puppeteer-config.json
+    scripts/     build.mjs
+    package.json, package-lock.json
 ```
+
+**SKILL.md is an orchestrator, kept lean.** It carries when-to-use, the process spine, and a
+reference map; everything else (content shapes, diagram/code detail, primitives, checklists) lives in
+`references/*.md` and is pulled in only when needed. When adding guidance, put detail in a reference
+file and link it from SKILL.md — don't grow the always-loaded SKILL.md.
 
 ## Shared core + offline build (shipped)
 
 The shared-core + offline-build refactor is complete. Shared assets live at
-`skills/visual-explainer-core/` (`core.css`, `core.js`, `shiki-theme.json`). Skills reference the
-core via `<!-- @core:css -->` / `<!-- @core:js -->` markers in their `template.html`.
+`skills/visual-explainer-core/assets/` (`core.css`, `core.js`, `shiki-theme.json`). Skills reference
+the core via `<!-- @core:css -->` / `<!-- @core:js -->` markers in their `templates/template.html`.
 
 To produce a fully offline artifact, run:
 
-    node "${CLAUDE_PLUGIN_ROOT}/skills/visual-explainer-core/build.mjs" path/to/your-file.html
+    node "${CLAUDE_PLUGIN_ROOT}/skills/visual-explainer-core/scripts/build.mjs" path/to/your-file.html
 
-(Outside an installed plugin, substitute the repo-relative path to `build.mjs`.) Run `npm install`
-once in `skills/visual-explainer-core/` first — this also fetches a one-time headless Chromium for
-Mermaid pre-rendering (~150–200 MB; set `PUPPETEER_EXECUTABLE_PATH` to reuse a system Chrome).
+(Outside an installed plugin, substitute the repo-relative path to `scripts/build.mjs`.) Run
+`npm install` once in `skills/visual-explainer-core/` first — this also fetches a one-time headless
+Chromium for Mermaid pre-rendering (~150–200 MB; set `PUPPETEER_EXECUTABLE_PATH` to reuse a system
+Chrome). What each build stage does is documented in
+`skills/visual-explainer-core/references/build-pipeline.md`.
 
 **`visual-explainer-core` is intentionally NOT listed in `.claude-plugin/plugin.json`'s `skills`
 array.** It is shared infrastructure and a contributor contract, not a user-facing explainer

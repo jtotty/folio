@@ -15,21 +15,30 @@ theme variation.
 
 ## What lives here
 
-| File | Responsibility |
+Files are grouped by role; `SKILL.md` + `package.json` stay at the root.
+
+| Path | Responsibility |
 |---|---|
-| `core.css` | All shared CSS: `:root` tokens, typography, primitives, code-token palette, a11y, print. |
-| `core.js` | Copy buttons, tabs (+keyboard), sliders, TOC scroll-spy, back-to-top, diagram zoom. |
-| `shiki-theme.json` | TextMate theme reproducing the warm code palette (inline-style highlighting). |
-| `mmdc-config.json` | Mermaid theme/sequence config (locked palette). |
-| `build.mjs` | Inlines core, pre-renders Mermaid→SVG and code→Shiki, strips CDN. Offline output. |
+| `assets/core.css` | All shared CSS: `:root` tokens, typography, primitives, code-token palette, a11y, print. |
+| `assets/core.js` | Copy buttons, tabs (+keyboard), sliders, TOC scroll-spy, back-to-top, diagram zoom. |
+| `assets/shiki-theme.json` | TextMate theme reproducing the warm code palette (inline-style highlighting). |
+| `config/mmdc-config.json` | Mermaid theme/sequence config (locked palette). |
+| `config/puppeteer-config.json` | `--no-sandbox` for headless Chromium. |
+| `scripts/build.mjs` | Inlines core, pre-renders Mermaid→SVG and code→Shiki, strips CDN. Offline output. |
+| `references/build-pipeline.md` | Full walkthrough of what the build does, its deps, and troubleshooting. |
 
 ## How a domain skill uses the core
 
-1. The domain `template.html` puts `<!-- @core:css -->` in `<head>` and `<!-- @core:js -->` before
-   `</body>`, and adds only its own components in a small `<style>` block.
+1. The domain `templates/template.html` puts `<!-- @core:css -->` in `<head>` and `<!-- @core:js -->`
+   before `</body>`, and adds only its own components in a small `<style>` block.
 2. Author fills in content; Mermaid as `.mermaid` blocks, code as `<pre><code class="language-X">`.
-3. Run `node "${CLAUDE_PLUGIN_ROOT}/skills/visual-explainer-core/build.mjs" <file.html>` to produce
-   a self-contained offline artifact. Install deps once first: `npm install` in `visual-explainer-core/`.
+3. Run the build to produce a self-contained offline artifact:
+
+       node "${CLAUDE_PLUGIN_ROOT}/skills/visual-explainer-core/scripts/build.mjs" <file.html>
+
+   Install deps once first: `npm install` in `skills/visual-explainer-core/` (fetches a one-time
+   headless Chromium). **What each build stage does, and how to debug it, is in
+   [`references/build-pipeline.md`](references/build-pipeline.md).**
 
 ## The locked palette (do not change)
 

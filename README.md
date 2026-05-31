@@ -48,7 +48,7 @@ visual walkthrough"*, or *"compare these 4 approaches side by side."*
 
 ## Design principles
 
-- **One locked theme, every time.** Consistency over novelty. See `skills/*/SKILL.md` → "Visual system (locked)".
+- **One locked theme, every time.** Consistency over novelty. The whole design system lives once in `skills/visual-explainer-core/` and every skill inherits it.
 - **Stay in the loop.** Optimize every choice for *the human actually reading it once* — a 60%
   explanation they finish beats a 100% one they don't open.
 - **Real code, not pseudocode.** Snippets are verified against the source so the reader sees the exact
