@@ -1,0 +1,41 @@
+{
+  "name": "warm-paper",
+  "type": "light",
+  "colors": {
+    "editor.background": "#f1ede4",
+    "editor.foreground": "#2a2a2a"
+  },
+  "tokenColors": [
+    { "scope": ["comment", "punctuation.definition.comment"],
+      "settings": { "foreground": "#9a9388", "fontStyle": "italic" } },
+    { "scope": ["keyword", "keyword.control", "storage.type", "storage.modifier",
+                "keyword.operator.new", "keyword.operator.expression", "keyword.other",
+                "constant.language.boolean", "constant.language.null",
+                "constant.language.nil", "constant.language.undefined",
+                "variable.language.this", "variable.language.self"],
+      "settings": { "foreground": "#d6432e", "fontStyle": "bold" } },
+    { "scope": ["string", "string.quoted", "string.template", "constant.character",
+                "string.regexp", "constant.other.symbol.ruby"],
+      "settings": { "foreground": "#b8881a" } },
+    { "scope": ["constant.other.symbol", "entity.other.attribute-name",
+                "keyword.control.at-rule", "meta.attribute"],
+      "settings": { "foreground": "#2e8a6b", "fontStyle": "bold" } },
+    { "scope": ["constant.other", "entity.name.type", "entity.name.class",
+                "support.class", "entity.name.tag", "entity.name.namespace",
+                "storage.type.class"],
+      "settings": { "foreground": "#2476b8", "fontStyle": "bold" } },
+    { "scope": ["constant.numeric", "constant.numeric.integer", "constant.numeric.float"],
+      "settings": { "foreground": "#9a3fc4" } },
+    { "scope": ["keyword.operator", "punctuation", "meta.brace",
+                "punctuation.separator", "punctuation.terminator"],
+      "settings": { "foreground": "#6a6a6a" } },
+    { "scope": ["entity.name.function", "support.function", "variable",
+                "variable.other", "variable.other.readwrite", "variable.parameter",
+                "meta.property", "variable.other.property",
+                "variable.other.object.property"],
+      "settings": { "foreground": "#1a1a1a" } },
+    { "scope": ["support.type", "support.constant", "support.function.builtin",
+                "support.type.builtin", "keyword.other.important"],
+      "settings": { "foreground": "#e07820", "fontStyle": "bold" } }
+  ]
+}
