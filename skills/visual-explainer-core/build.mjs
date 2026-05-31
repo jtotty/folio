@@ -3,13 +3,13 @@
 // Shiki (inline styles), strips CDN tags. Output is a self-contained offline file.
 // Usage: node build.mjs <path-to-draft.html>   (rewrites the file in place)
 
-import { readFileSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdtempSync, rmSync, renameSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'node-html-parser';
-import { createHighlighter } from 'shiki';
+import { createHighlighter, bundledLanguages } from 'shiki';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const inFile = process.argv[2];
@@ -37,28 +37,37 @@ const root = parse(html, {
 // 2) Pre-render every Mermaid block to inline SVG via mmdc (locked theme).
 const mmdcCfg = join(HERE, 'mmdc-config.json');
 const pptrCfg = join(HERE, 'puppeteer-config.json');
+const MMDC = join(HERE, 'node_modules', '.bin', 'mmdc');
 const mermaids = root.querySelectorAll('.mermaid');
 if (mermaids.length) {
   const tmp = mkdtempSync(join(tmpdir(), 've-'));
-  mermaids.forEach((node, i) => {
-    const src = node.text.trim();
-    const mmd = join(tmp, `d${i}.mmd`);
-    const out = join(tmp, `d${i}.svg`);
-    writeFileSync(mmd, src);
-    execFileSync('npx', ['-y', '@mermaid-js/mermaid-cli', 'mmdc',
-      '-i', mmd, '-o', out, '-c', mmdcCfg, '-p', pptrCfg, '-b', 'transparent'],
-      { stdio: 'inherit' });
-    let svg = readFileSync(out, 'utf8').replace(/<\?xml[^>]*\?>/, '').trim();
-    svg = svg.replace('<svg ', '<svg style="max-width:100%;height:auto" ');
-    node.replaceWith(parse(svg));
-  });
-  rmSync(tmp, { recursive: true, force: true });
+  try {
+    mermaids.forEach((node, i) => {
+      const src = node.text.trim();
+      if (!src) { console.warn('skipping empty .mermaid block #' + i); return; }
+      const mmd = join(tmp, `d${i}.mmd`);
+      const out = join(tmp, `d${i}.svg`);
+      writeFileSync(mmd, src);
+      try {
+        execFileSync(MMDC,
+          ['-i', mmd, '-o', out, '-c', mmdcCfg, '-p', pptrCfg, '-b', 'transparent'],
+          { stdio: 'inherit' });
+      } catch (err) {
+        console.error('Mermaid block #' + i + ' failed to render:\n' +
+          (err.stderr ? err.stderr.toString() : err.message));
+        throw err;
+      }
+      let svg = readFileSync(out, 'utf8').replace(/<\?xml[^>]*\?>/, '').trim();
+      svg = svg.replace('<svg ', '<svg style="max-width:100%;height:auto" ');
+      node.replaceWith(parse(svg));
+    });
+  } finally {
+    rmSync(tmp, { recursive: true, force: true });
+  }
 }
 
 // 3) Highlight every code block via Shiki → inline styles (no client JS).
 const ALIAS = { protobuf: 'proto' }; // Prism id -> Shiki id where they differ
-const decode = (s) => s.replace(/&lt;/g, '<').replace(/&gt;/g, '>')
-  .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&');
 const codeNodes = root.querySelectorAll('pre code[class*="language-"]');
 if (codeNodes.length) {
   const theme = JSON.parse(readFileSync(join(HERE, 'shiki-theme.json'), 'utf8'));
@@ -66,15 +75,20 @@ if (codeNodes.length) {
     const m = (c.getAttribute('class') || '').match(/language-([\w-]+)/);
     return m ? (ALIAS[m[1]] || m[1]) : null;
   }).filter(Boolean))];
-  const hl = await createHighlighter({ themes: [theme], langs: wanted });
-  const loaded = new Set(hl.getLoadedLanguages());
-  for (const code of codeNodes) {
-    const m = (code.getAttribute('class') || '').match(/language-([\w-]+)/);
-    let lang = m ? (ALIAS[m[1]] || m[1]) : 'text';
-    if (!loaded.has(lang)) lang = 'text';
-    const raw = decode(code.innerHTML);
-    const highlighted = hl.codeToHtml(raw, { lang, theme: 'warm-paper' });
-    code.closest('pre').replaceWith(parse(highlighted));
+  const known = wanted.filter((l) => l in bundledLanguages);
+  const hl = await createHighlighter({ themes: [theme], langs: known });
+  try {
+    const loaded = new Set(hl.getLoadedLanguages());
+    for (const code of codeNodes) {
+      const m = (code.getAttribute('class') || '').match(/language-([\w-]+)/);
+      let lang = m ? (ALIAS[m[1]] || m[1]) : 'text';
+      if (!loaded.has(lang)) lang = 'text';
+      const raw = code.text;
+      const highlighted = hl.codeToHtml(raw, { lang, theme: 'warm-paper' });
+      code.closest('pre').replaceWith(parse(highlighted));
+    }
+  } finally {
+    hl.dispose();
   }
 }
 
@@ -82,5 +96,7 @@ if (codeNodes.length) {
 root.querySelectorAll('script[src*="mermaid"], script[src*="prism"], link[href*="prism"]')
   .forEach((n) => n.remove());
 
-writeFileSync(inFile, root.toString());
+const tmpOut = inFile + '.tmp';
+writeFileSync(tmpOut, root.toString());
+renameSync(tmpOut, inFile);
 console.log('built (offline) →', inFile);
