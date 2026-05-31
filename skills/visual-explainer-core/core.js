@@ -18,6 +18,9 @@ document.addEventListener('DOMContentLoaded', function () {
           btn.classList.remove('copied');
           btn.textContent = btn.dataset.copyLabel;
         }, 1400);
+      }).catch(function () {
+        btn.textContent = 'Copy failed';
+        setTimeout(function () { btn.textContent = btn.dataset.copyLabel || 'Copy'; }, 1400);
       });
     });
   });
@@ -26,6 +29,8 @@ document.addEventListener('DOMContentLoaded', function () {
   document.querySelectorAll('.tabs').forEach(function (tabs) {
     var btns = Array.prototype.slice.call(tabs.querySelectorAll('.tab-btn'));
     var panels = Array.prototype.slice.call(tabs.querySelectorAll('.tab-panel'));
+    var tabsBar = tabs.querySelector('.tabs-bar');
+    if (tabsBar) tabsBar.setAttribute('role', 'tablist');
     function select(i) {
       btns.forEach(function (b, j) {
         var on = i === j;
@@ -35,6 +40,7 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     }
     btns.forEach(function (btn, i) {
+      btn.setAttribute('role', 'tab');
       // Wire ARIA relationships if missing.
       if (!btn.id) btn.id = 'tab-' + Math.random().toString(36).slice(2, 8);
       if (panels[i]) {
@@ -99,6 +105,7 @@ document.addEventListener('DOMContentLoaded', function () {
   var overlay = document.querySelector('.diagram-overlay');
   if (overlay) {
     var inner = overlay.querySelector('.inner');
+    if (!inner) return;
     function openDiagram(node) {
       inner.innerHTML = '';
       var clone = node.cloneNode(true);
