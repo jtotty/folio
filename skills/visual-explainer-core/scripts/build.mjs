@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Inlines the shared core, pre-renders Mermaid → inline SVG, highlights code via
 // Shiki (inline styles), strips CDN tags. Output is a self-contained offline file.
-// Usage: node build.mjs <path-to-draft.html>   (rewrites the file in place)
+// Usage: node scripts/build.mjs <path-to-draft.html>   (rewrites the file in place)
 
 import { readFileSync, writeFileSync, mkdtempSync, rmSync, renameSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
@@ -11,15 +11,16 @@ import { fileURLToPath } from 'node:url';
 import { parse } from 'node-html-parser';
 import { createHighlighter, bundledLanguages } from 'shiki';
 
-const HERE = dirname(fileURLToPath(import.meta.url));
+const HERE = dirname(fileURLToPath(import.meta.url)); // skills/visual-explainer-core/scripts
+const ROOT = dirname(HERE);                            // skills/visual-explainer-core
 const inFile = process.argv[2];
-if (!inFile) { console.error('usage: node build.mjs <draft.html>'); process.exit(1); }
+if (!inFile) { console.error('usage: node scripts/build.mjs <draft.html>'); process.exit(1); }
 
 let html = readFileSync(inFile, 'utf8');
 
 // 1) Inline shared core CSS + JS at the template markers.
-const css = readFileSync(join(HERE, 'core.css'), 'utf8');
-const js  = readFileSync(join(HERE, 'core.js'), 'utf8');
+const css = readFileSync(join(ROOT, 'assets', 'core.css'), 'utf8');
+const js  = readFileSync(join(ROOT, 'assets', 'core.js'), 'utf8');
 if (!html.includes('<!-- @core:css -->')) console.warn('warning: <!-- @core:css --> marker not found');
 if (!html.includes('<!-- @core:js -->'))  console.warn('warning: <!-- @core:js --> marker not found');
 html = html.replace('<!-- @core:css -->', '<style>\n' + css + '\n</style>');
@@ -35,9 +36,9 @@ const root = parse(html, {
 });
 
 // 2) Pre-render every Mermaid block to inline SVG via mmdc (locked theme).
-const mmdcCfg = join(HERE, 'mmdc-config.json');
-const pptrCfg = join(HERE, 'puppeteer-config.json');
-const MMDC = join(HERE, 'node_modules', '.bin', 'mmdc');
+const mmdcCfg = join(ROOT, 'config', 'mmdc-config.json');
+const pptrCfg = join(ROOT, 'config', 'puppeteer-config.json');
+const MMDC = join(ROOT, 'node_modules', '.bin', 'mmdc');
 const mermaids = root.querySelectorAll('.mermaid');
 if (mermaids.length) {
   const tmp = mkdtempSync(join(tmpdir(), 've-'));
@@ -70,7 +71,7 @@ if (mermaids.length) {
 const ALIAS = { protobuf: 'proto' }; // Prism id -> Shiki id where they differ
 const codeNodes = root.querySelectorAll('pre code[class*="language-"]');
 if (codeNodes.length) {
-  const theme = JSON.parse(readFileSync(join(HERE, 'shiki-theme.json'), 'utf8'));
+  const theme = JSON.parse(readFileSync(join(ROOT, 'assets', 'shiki-theme.json'), 'utf8'));
   const wanted = [...new Set(codeNodes.map((c) => {
     const m = (c.getAttribute('class') || '').match(/language-([\w-]+)/);
     return m ? (ALIAS[m[1]] || m[1]) : null;
