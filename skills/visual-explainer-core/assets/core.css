@@ -1,25 +1,3 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{{TITLE}} — Explainer</title>
-
-  <!-- Mermaid for diagrams -->
-  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
-
-  <!-- Prism for code syntax highlighting.
-       Load one component per language used in this document.
-       Examples (replace with the languages this explainer actually contains):
-         <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-ruby.min.js"></script>
-         <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
-         <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
-         <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-go.min.js"></script>
-         <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-rust.min.js"></script> -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" data-manual></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-{{LANGUAGE}}.min.js"></script>
-
-  <style>
     :root {
       --bg: #f7f5f0;
       --paper: #ffffff;
@@ -451,379 +429,150 @@
       .slider-label, .slider-value { text-align: left; min-width: 0; }
       .diff-hunk .line-num { min-width: 36px; padding-right: 8px; }
     }
-  </style>
-</head>
-<body>
-  <div class="wrap">
 
-    <header class="page">
-      <p class="eyebrow">{{EYEBROW e.g. "Feature Explainer · TICKET-ID"}}</p>
-      <h1>{{TITLE — short, descriptive}}</h1>
-      <p class="lede">{{LEDE — one or two sentences in plain language: what this is and why the reader should care.}}</p>
-      <div class="meta">
-        <span><strong>Date:</strong> {{YYYY-MM-DD}}</span>
-        <span><strong>Source:</strong> {{path/to/source-doc}}</span>
-        <!-- Add more meta entries as needed (branch, ticket, owner, audience, etc.) -->
-      </div>
-    </header>
+/* ===== Accessibility layer (additive) ===== */
 
-    <nav class="toc">
-      <p class="eyebrow">Contents</p>
-      <ol>
-        <li><a href="#what">What this is</a></li>
-        <li><a href="#vocab">Vocabulary</a></li>
-        <li><a href="#lifecycle">Lifecycle / flow</a></li>
-        <li><a href="#structure">Structure</a></li>
-        <li><a href="#code">Key code</a></li>
-        <li><a href="#walkthrough">Worked example</a></li>
-        <li><a href="#edges">Edge cases</a></li>
-        <li><a href="#out">Out of scope</a></li>
-      </ol>
-    </nav>
+:root {
+  /* #8a8a8a (--ink-dim) is ~3.45:1 on paper — fine for decorative/large use, but
+     fails WCAG AA (4.5:1) for the 12-13px mono labels (eyebrow, meta, footer).
+     --ink-label is a darker neutral (~5.0:1) used ONLY for those small labels.
+     The hue stays the same warm-neutral grey, so the look is unchanged. */
+  --ink-label: #6e6a63;
+  --focus-ring: #2f5d50;
+}
 
-    <!-- ============================ -->
-    <section>
-      <h2 id="what">What this is</h2>
-      <p>{{Plain-language framing. No jargon yet — that comes in Vocabulary. Three to five sentences.}}</p>
+/* Upgrade small mono labels to the AA-compliant neutral. Same family, darker. */
+.eyebrow,
+.meta,
+footer { color: var(--ink-label); }
 
-      <div class="callout">
-        <p><strong>Plain-language take.</strong> {{The "if you remember one thing" framing.}}</p>
-      </div>
+/* Visible keyboard focus everywhere interactive. Mouse users never see it. */
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible,
+.tab-btn:focus-visible,
+.copy-btn:focus-visible,
+input.slider:focus-visible,
+.diagram:focus-visible,
+.svg-diagram:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
 
-      <!-- Optional summary table: inputs/triggers → effects -->
-      <table class="matrix">
-        <thead><tr><th>Trigger</th><th>Effect</th><th>Side effect</th></tr></thead>
-        <tbody>
-          <tr><td class="criterion">{{trigger 1}}</td><td>{{effect}}</td><td>{{side effect}}</td></tr>
-          <tr><td class="criterion">{{trigger 2}}</td><td>{{effect}}</td><td>{{side effect}}</td></tr>
-        </tbody>
-      </table>
-    </section>
+/* Honor reduced-motion: kill transitions/animations for users who ask. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
 
-    <!-- ============================ -->
-    <section>
-      <h2 id="vocab">Vocabulary</h2>
-      <div class="vocab">
-        <div class="v">
-          <h4>{{Term A}}</h4>
-          <p>{{Definition in plain language. Reference real names from the system in <code>monospace</code>.}}</p>
-        </div>
-        <div class="v">
-          <h4>{{Term B}}</h4>
-          <p>{{Definition.}}</p>
-        </div>
-        <div class="v">
-          <h4>{{Term C}}</h4>
-          <p>{{Definition.}}</p>
-        </div>
-        <div class="v">
-          <h4>{{Term D}}</h4>
-          <p>{{Definition.}}</p>
-        </div>
-      </div>
-    </section>
+/* ===== Comprehension components (additive) ===== */
 
-    <!-- ============================ -->
-    <section>
-      <h2 id="lifecycle">Lifecycle / flow</h2>
+/* "~6-min read · covers X, Y, Z" line under the lede. Sets expectations. */
+.reading-meta {
+  font-family: "SF Mono", "JetBrains Mono", "IBM Plex Mono", Menlo, monospace;
+  font-size: 12px; letter-spacing: 0.04em; color: var(--ink-label);
+  margin: 6px 0 0;
+}
 
-      <div class="diagram">
-        <div class="mermaid">
-{{Mermaid diagram. Pick whichever fits:
+/* Tufte-style numbered sidenote — pure CSS, zero JS.
+   Markup:
+     <label for="sn-1" class="sidenote-toggle">1</label>
+     <input type="checkbox" id="sn-1" class="sidenote-toggle-box">
+     <span class="sidenote">The note text.</span>
+   Wide screens: floats into the right margin. Narrow: click number to toggle. */
+.sidenote {
+  float: right; clear: right; width: 40%;
+  margin: 4px -44% 18px 0; font-size: 13px; line-height: 1.5;
+  color: var(--ink-soft); position: relative;
+}
+.sidenote-toggle {
+  color: var(--accent); cursor: pointer; vertical-align: super;
+  font-size: 11px; padding: 0 1px; font-weight: 600;
+}
+.sidenote-toggle-box { display: none; }
+@media (max-width: 980px) {
+  .sidenote { display: none; float: none; width: auto; margin: 10px 0; }
+  .sidenote-toggle-box:checked + .sidenote {
+    display: block;
+    background: #fafaf7; border-left: 3px solid var(--rule);
+    padding: 10px 14px; border-radius: 0 4px 4px 0;
+  }
+}
 
-  stateDiagram-v2
-      direction LR
-      [*] --> stateA: trigger
-      stateA --> stateB: trigger
-      stateB --> [*]
+/* Back-to-top affordance — appears after scroll (toggled by core.js). */
+.to-top {
+  position: fixed; right: 20px; bottom: 20px; z-index: 40;
+  display: none; align-items: center; gap: 6px;
+  background: var(--paper); border: 1px solid var(--rule);
+  color: var(--accent); border-radius: 20px; padding: 8px 14px;
+  font-family: "SF Mono", "JetBrains Mono", "IBM Plex Mono", Menlo, monospace;
+  font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;
+  font-weight: 600; cursor: pointer; box-shadow: var(--shadow);
+  text-decoration: none;
+}
+.to-top.visible { display: inline-flex; }
+.to-top::before { content: "↑"; }
 
-  sequenceDiagram
-      Client->>API: request
-      API->>DB: query
-      DB-->>API: rows
-      API-->>Client: response
+/* Active TOC link (set by scroll-spy in core.js). */
+nav.toc a.active { font-weight: 700; text-decoration: underline; }
 
-  flowchart LR
-      A --> B --> C
-}}
-        </div>
-      </div>
+/* Clickable diagrams get an expand cursor + tiny hint. */
+.diagram[data-expandable], .svg-diagram[data-expandable] { cursor: zoom-in; }
+.diagram[data-expandable]:hover, .svg-diagram[data-expandable]:hover {
+  border-color: var(--accent);
+}
 
-      <p>{{One paragraph explaining what the diagram is showing.}}</p>
-    </section>
+/* Fullscreen overlay for an expanded diagram. */
+.diagram-overlay {
+  position: fixed; inset: 0; z-index: 100; display: none;
+  background: rgba(26,26,26,0.72); padding: 4vh 4vw;
+  align-items: center; justify-content: center;
+}
+.diagram-overlay.open { display: flex; }
+.diagram-overlay .inner {
+  background: var(--paper); border-radius: 8px; padding: 24px;
+  max-width: 96vw; max-height: 92vh; overflow: auto; box-shadow: var(--shadow);
+}
+.diagram-overlay .inner svg { max-width: 100%; height: auto; }
+.diagram-overlay .close {
+  position: absolute; top: 18px; right: 22px;
+  background: var(--paper); border: 1px solid var(--rule);
+  color: var(--ink); border-radius: 4px; padding: 6px 12px; cursor: pointer;
+  font-family: "SF Mono", "JetBrains Mono", "IBM Plex Mono", Menlo, monospace;
+  font-size: 12px;
+}
 
-    <!-- ============================ -->
-    <section>
-      <h2 id="structure">Structure</h2>
+/* ===== Print / Save-as-PDF (additive) ===== */
+@media print {
+  :root { --shadow: none; }
+  body { background: #fff; font-size: 12px; }
+  .wrap { max-width: 100%; padding: 0; }
 
-      <!-- Option 1: Mermaid ER / class / component diagram -->
-      <div class="diagram">
-        <div class="mermaid">
-{{Example:
+  /* Never split these across a page break. */
+  .diagram, .svg-diagram, .callout, .vocab .v, .item-card,
+  .option-card, .concern, table.matrix, pre, .sidenote {
+    break-inside: avoid; box-shadow: none;
+  }
+  h2, h3 { break-after: avoid; }
 
-  erDiagram
-    TypeA ||--o{ TypeB : "has_many"
-    TypeB }o--|| TypeC : "belongs_to"
-}}
-        </div>
-      </div>
+  /* Save ink: dark fills become outlined instead of solid black. */
+  table.matrix thead th { background: #fff !important; color: #000 !important;
+    border-bottom: 1.5px solid #000; }
+  .entity { background: #fff !important; color: #000 !important; border: 1px solid #000; }
+  .entity[data-kind]::before { background: #000; color: #fff; }
 
-      <!-- Option 2: Custom HTML entity/module diagram.
-           data-kind is a 1-2 letter prefix tag — pick what fits the domain
-           (M=model, C=class, S=service, R=route, F=function, T=type, etc.) -->
-      <div class="diagram diagram-split">
-        <div class="column">
-          <p class="column-title">{{Left-side label}}</p>
-          <div class="entity" data-kind="">{{EntityName}}</div>
-          <div class="arrow-down">↓ includes / extends / depends on</div>
-          <div class="concern">
-            <div class="name">{{ModuleName}} <span class="tag">touched</span></div>
-            <ul>
-              <li class="unchanged">{{existing item}}</li>
-              <li class="added">{{new item}} <span class="label">ref</span></li>
-            </ul>
-          </div>
-        </div>
-        <div class="column">
-          <p class="column-title">{{Right-side label}}</p>
-          <div class="entity" data-kind="">{{EntityName}}</div>
-          <div class="arrow-down">↓</div>
-          <div class="concern new">
-            <div class="name">{{NewModuleName}} <span class="tag">new</span></div>
-            <ul>
-              <li class="added">{{new item}}</li>
-              <li class="added">{{new item}}</li>
-            </ul>
-          </div>
-        </div>
-      </div>
+  pre { white-space: pre-wrap; word-break: break-word; border: 1px solid var(--rule); }
 
-      <div class="legend">
-        <span><span class="swatch added"></span>added by this work</span>
-        <span><span class="swatch unchanged"></span>pre-existing, untouched</span>
-        <span><span class="swatch kept"></span>boundary kept</span>
-      </div>
-    </section>
+  /* Hide screen-only chrome. */
+  .to-top, .copy-btn, .diagram-overlay { display: none !important; }
 
-    <!-- ============================ -->
-    <!-- Optional: include only when the topic is a multi-PR / multi-ticket stack -->
-    <section>
-      <h2 id="items">The work, in order</h2>
-      <div class="item-grid">
-        <div class="item-card">
-          <span class="item-tag">{{TAG 1}}</span><h3>{{Title}}</h3>
-          <p>{{One-paragraph summary of what this item ships.}}</p>
-        </div>
-        <div class="item-card">
-          <span class="item-tag">{{TAG 2}}</span><h3>{{Title}}</h3>
-          <p>{{Summary.}}</p>
-        </div>
-      </div>
-    </section>
+  /* Sidenotes print inline as footnotes. */
+  .sidenote { float: none; width: auto; margin: 8px 0; display: block; }
 
-    <!-- ============================ -->
-    <section>
-      <h2 id="code">Key code</h2>
-
-      <h3>{{Snippet 1 — what it does in 6-10 words}}</h3>
-      <p>{{One sentence framing before the code.}}</p>
-<pre><code class="language-{{LANGUAGE}}">{{paste real code here}}
-</code></pre>
-
-      <h3>{{Snippet 2}}</h3>
-      <p>{{Framing.}}</p>
-<pre><code class="language-{{LANGUAGE}}">{{paste real code here}}
-</code></pre>
-
-      <div class="callout">
-        <p>{{Optional note about a non-obvious property of the code above — atomicity, idempotency, ordering, security boundary, etc.}}</p>
-      </div>
-    </section>
-
-    <!-- ============================ -->
-    <section>
-      <h2 id="walkthrough">Worked example</h2>
-      <p>{{Set up a concrete scenario. Real values, real names. Two or three sentences.}}</p>
-
-      <table class="matrix">
-        <thead>
-          <tr>
-            <th>Step</th>
-            <th>State</th>
-            <th>{{Observable 1}}</th>
-            <th>{{Observable 2}}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td class="criterion">Initial</td><td>—</td><td>{{value}}</td><td>{{value}}</td></tr>
-          <tr><td class="criterion">{{Step 1}}</td><td>{{state}}</td><td>{{value}}</td><td>{{value}}</td></tr>
-          <tr><td class="criterion">{{Step 2}}</td><td>{{state}}</td><td>{{value}}</td><td>{{value}}</td></tr>
-        </tbody>
-      </table>
-
-      <p>{{One paragraph explaining what changed at each step and why.}}</p>
-    </section>
-
-    <!-- ============================ -->
-    <!-- Optional: interactive primitives — keep, customize, or delete -->
-    <section>
-      <h2 id="primitives">Interactive primitives (optional)</h2>
-      <p>Available components in the template — use where they serve the explanation, delete this section otherwise.</p>
-
-      <h3>Copy button</h3>
-      <p>Attach to anything the reader might paste back into a prompt.</p>
-      <button class="copy-btn" data-copy-text="{{text to copy}}">Copy snippet</button>
-
-      <h3>Tabs</h3>
-      <div class="tabs">
-        <div class="tabs-bar" role="tablist">
-          <button class="tab-btn" role="tab" aria-selected="true">Option A</button>
-          <button class="tab-btn" role="tab" aria-selected="false">Option B</button>
-        </div>
-        <div class="tab-panel" role="tabpanel" aria-hidden="false">{{content A}}</div>
-        <div class="tab-panel" role="tabpanel" aria-hidden="true">{{content B}}</div>
-      </div>
-
-      <h3>Collapsible deep-dive</h3>
-      <details class="collapsible">
-        <summary>{{Deep dive summary}}</summary>
-        <p>{{Hidden detail content.}}</p>
-      </details>
-
-      <h3>Tunable parameter</h3>
-      <div class="slider-row">
-        <span class="slider-label">{{Parameter name}}</span>
-        <input type="range" class="slider" min="0" max="100" value="50">
-        <span class="slider-value">50</span>
-      </div>
-    </section>
-
-    <!-- ============================ -->
-    <!-- Optional: PR explainer mode — diff with annotations -->
-    <section>
-      <h2 id="diff">Diff with annotations (PR mode)</h2>
-      <div class="diff">
-        <div class="diff-header">{{path/to/file.ext}}</div>
-        <pre class="diff-hunk">
-<span class="line ctx"><span class="line-num">12</span><span class="line-content">existing context</span></span>
-<span class="line del"><span class="line-num">13</span><span class="line-content">old code removed</span></span>
-<span class="line add"><span class="line-num">13</span><span class="line-content">new code added</span></span>
-<span class="line ctx"><span class="line-num">14</span><span class="line-content">existing context</span></span>
-        </pre>
-        <aside class="margin-note"><span class="badge severity-warn">Watch</span>{{Reviewer note about this hunk.}}</aside>
-      </div>
-    </section>
-
-    <!-- ============================ -->
-    <section>
-      <h2 id="edges">Edge cases &amp; guards</h2>
-
-      <h3>{{Edge case 1}}</h3>
-      <p>{{One-paragraph answer. Reference the actual code path that handles it.}}</p>
-
-      <h3>{{Edge case 2}}</h3>
-      <p>{{Answer.}}</p>
-
-      <div class="callout warn">
-        <p><strong>{{Warning heading}}</strong> — {{the load-bearing safety property of the system: atomicity, idempotency, security boundary, etc.}}</p>
-      </div>
-    </section>
-
-    <!-- ============================ -->
-    <section>
-      <h2 id="out">Out of scope</h2>
-      <ul class="tight">
-        <li><strong>{{Item}}</strong> — {{why it's deferred and where it's tracked.}}</li>
-        <li><strong>{{Item}}</strong> — {{why.}}</li>
-      </ul>
-    </section>
-
-    <footer>
-      <p>{{path/to/this/file.html}} · prepared for {{audience}} · source: {{path/to/source-doc}}</p>
-    </footer>
-
-  </div>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      if (window.Prism) { Prism.highlightAll(); }
-
-      // Copy-to-clipboard buttons
-      document.querySelectorAll('.copy-btn').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-          var text = btn.dataset.copyText;
-          if (!text && btn.dataset.copyTarget) {
-            var el = document.querySelector(btn.dataset.copyTarget);
-            if (el) text = el.innerText || el.value || '';
-          }
-          if (!text) return;
-          navigator.clipboard.writeText(text).then(function () {
-            btn.classList.add('copied');
-            var orig = btn.dataset.copyLabel || btn.textContent;
-            if (!btn.dataset.copyLabel) btn.dataset.copyLabel = orig.trim();
-            btn.textContent = 'Copied';
-            setTimeout(function () {
-              btn.classList.remove('copied');
-              btn.textContent = btn.dataset.copyLabel;
-            }, 1400);
-          });
-        });
-      });
-
-      // Tabs
-      document.querySelectorAll('.tabs').forEach(function (tabs) {
-        var btns = tabs.querySelectorAll('.tab-btn');
-        var panels = tabs.querySelectorAll('.tab-panel');
-        btns.forEach(function (btn, i) {
-          btn.addEventListener('click', function () {
-            btns.forEach(function (b) { b.setAttribute('aria-selected', 'false'); });
-            panels.forEach(function (p) { p.setAttribute('aria-hidden', 'true'); });
-            btn.setAttribute('aria-selected', 'true');
-            if (panels[i]) panels[i].setAttribute('aria-hidden', 'false');
-          });
-        });
-      });
-
-      // Slider live readout
-      document.querySelectorAll('.slider').forEach(function (slider) {
-        var valueEl = slider.parentElement.querySelector('.slider-value');
-        if (!valueEl) return;
-        var update = function () { valueEl.textContent = slider.value; };
-        update();
-        slider.addEventListener('input', update);
-      });
-    });
-
-    mermaid.initialize({
-      startOnLoad: true,
-      theme: 'base',
-      // Sequence diagrams: compact fonts + layout. mirrorActors:false drops the
-      // duplicate participant row at the bottom. Prefer `participant` over `actor`
-      // in the diagram source — `actor` draws an oversized stick-figure glyph.
-      sequence: {
-        actorFontSize: 12,
-        messageFontSize: 11,
-        noteFontSize: 11,
-        actorMargin: 55,
-        boxMargin: 8,
-        mirrorActors: false
-      },
-      themeVariables: {
-        fontFamily: '"SF Mono", "JetBrains Mono", "IBM Plex Mono", Menlo, monospace',
-        fontSize: '13px',
-        primaryColor: '#e3ede9',
-        primaryTextColor: '#1a1a1a',
-        primaryBorderColor: '#2f5d50',
-        lineColor: '#8a8a8a',
-        secondaryColor: '#f1ede4',
-        tertiaryColor: '#ffffff',
-        noteBkgColor: '#fcecdc',
-        noteTextColor: '#4a4a4a',
-        noteBorderColor: '#e6e2d8',
-        clusterBkg: '#fafaf7',
-        clusterBorder: '#e6e2d8'
-      }
-    });
-  </script>
-</body>
-</html>
+  a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 10px; color: #555; }
+}

@@ -17,15 +17,40 @@ project rejects. Consistency is the product.
 
 ## Layout
 
+Each skill keeps `SKILL.md` at its root and groups supporting files by role (the canonical skill
+layout, as in nicobailon/visual-explainer):
+
 ```
-.claude-plugin/   plugin.json + marketplace.json (install manifests)
-skills/           one folder per skill, each with SKILL.md
-docs/plans/       implementation plans (e.g. the shared-core + offline-build refactor)
+.claude-plugin/                 plugin.json + marketplace.json (install manifests)
+skills/
+  software-visual-explainer/
+    SKILL.md                    lean orchestrator
+    references/*.md             detail, loaded on demand
+    templates/template.html
+  code-option-comparison/       (same shape)
+  visual-explainer-core/        shared design system (not a user-facing generator)
+    SKILL.md
+    assets/      core.css, core.js   ← canonical locked theme
 ```
 
-## In progress
+**SKILL.md is an orchestrator, kept lean.** It carries when-to-use, the process spine, and a
+reference map; everything else (content shapes, diagram/code detail, primitives, checklists) lives in
+`references/*.md` and is pulled in only when needed. When adding guidance, put detail in a reference
+file and link it from SKILL.md — don't grow the always-loaded SKILL.md.
 
-The shared-core + offline-build refactor is planned in
-`docs/plans/2026-05-31-visual-explainer-shared-core.md`. When executed, the locked CSS/JS moves to a
-shared `skills/visual-explainer-core/`, and a `build.mjs` pre-renders Mermaid/code for offline output.
-Bundled scripts are referenced at runtime via `${CLAUDE_PLUGIN_ROOT}`.
+## Shared core + CDN rendering (no build)
+
+The locked theme lives once in `skills/visual-explainer-core/assets/` (`core.css`, `core.js`). Each
+domain `templates/template.html` is **fully self-contained**: it embeds an inline copy of that core
+and loads Mermaid + Prism from a CDN. There is **no build step** — fill in the template, replace
+`{{LANGUAGE}}` in the Prism `<script>` tag, and open the file in a browser. (CDN-dependent, so not
+offline; that's the deliberate trade for simplicity.)
+
+`core.css`/`core.js` are the **canonical** copy; the templates' inline copies must match them. When
+you change the theme, edit the canonical files first, then paste the update into each template's
+`<style>` / `<script>`. This manual sync is the one discipline that keeps the family consistent —
+there is deliberately no build to automate it.
+
+**`visual-explainer-core` is intentionally NOT listed in `.claude-plugin/plugin.json`'s `skills`
+array.** It is shared infrastructure and a contributor contract, not a user-facing explainer
+generator, so it is not surfaced as an installable `/folio:` command. Do not "fix" this omission.

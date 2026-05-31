@@ -48,24 +48,22 @@ visual walkthrough"*, or *"compare these 4 approaches side by side."*
 
 ## Design principles
 
-- **One locked theme, every time.** Consistency over novelty. See `skills/*/SKILL.md` → "Visual system (locked)".
+- **One locked theme, every time.** Consistency over novelty. The whole design system lives once in `skills/visual-explainer-core/` and every skill inherits it.
 - **Stay in the loop.** Optimize every choice for *the human actually reading it once* — a 60%
   explanation they finish beats a 100% one they don't open.
 - **Real code, not pseudocode.** Snippets are verified against the source so the reader sees the exact
   symbols they'll find in the codebase.
-- **Self-contained output.** One HTML file. (Today: diagrams/highlighting load from CDN. Next: a build
-  step pre-renders everything for fully offline output — see [the plan](docs/plans/2026-05-31-visual-explainer-shared-core.md).)
+- **Single-file output, no build.** One HTML file you just open in a browser — it embeds the shared theme and renders Mermaid diagrams + syntax-highlighted code from a CDN. Nothing to install.
+
+## Shipped
+
+- Shared design system in `skills/visual-explainer-core/` (canonical `core.css` + `core.js`) — every skill embeds the same theme, so they can't drift.
+- Self-contained CDN templates: copy, fill in, open. Mermaid + Prism render in the browser with the locked theme — no build step, no Node.
+- Accessibility (WCAG-AA contrast, focus, keyboard), a print/Save-as-PDF stylesheet, and reading-first comprehension aids (scroll-spy, sidenotes, details-on-demand).
 
 ## Roadmap
 
-- Extract the locked visual system into a shared `visual-explainer-core` so every skill — and every
-  future domain — inherits one identity with zero drift.
-- Offline-by-default output: pre-render Mermaid → inline SVG and code → inline-styled highlighting.
-- Accessibility (WCAG-AA contrast, focus, keyboard), a print/Save-as-PDF stylesheet, and reading-first
-  comprehension aids (scroll-spy, sidenotes, details-on-demand).
 - New domains: `finance-visual-explainer`, `article-visual-explainer`.
-
-The full implementation plan lives in [`docs/plans/`](docs/plans/2026-05-31-visual-explainer-shared-core.md).
 
 ## License
 
