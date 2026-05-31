@@ -5,163 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{{TOPIC}} — Options Compared</title>
 
-  <!-- Mermaid for diagrams -->
-  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
-
-  <!-- Prism for code syntax highlighting.
-       Load one component per language used in this document.
-       Examples (replace with the languages this comparison actually contains):
-         <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-ruby.min.js"></script>
-         <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
-         <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
-         <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-go.min.js"></script>
-         <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-rust.min.js"></script> -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js" data-manual></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-{{LANGUAGE}}.min.js"></script>
+  <!-- Shared visual-explainer core (inlined by the build step). -->
+  <!-- @core:css -->
 
   <style>
-    :root {
-      --bg: #f7f5f0;
-      --paper: #ffffff;
-      --ink: #1a1a1a;
-      --ink-soft: #4a4a4a;
-      --ink-dim: #8a8a8a;
-      --rule: #e6e2d8;
-      --accent: #2f5d50;
-      --accent-soft: #e3ede9;
-      --warn: #b8651f;
-      --warn-soft: #fcecdc;
-      --bad: #a8413a;
-      --bad-soft: #f8e2df;
-      --good: #2f5d50;
-      --good-soft: #e0ebe6;
-      --neutral: #6b6661;
-      --neutral-soft: #efeae2;
-      --code-bg: #f1ede4;
-      --shadow: 0 1px 0 rgba(0,0,0,0.04), 0 4px 18px rgba(60, 50, 30, 0.06);
-    }
-    * { box-sizing: border-box; }
-    html, body { margin: 0; padding: 0; }
-    body {
-      background: var(--bg);
-      color: var(--ink);
-      font-family: "Iowan Old Style", "Source Serif Pro", Georgia, "Times New Roman", serif;
-      font-size: 16px;
-      line-height: 1.55;
-      -webkit-font-smoothing: antialiased;
-      text-rendering: optimizeLegibility;
-    }
-    .wrap { max-width: 1180px; margin: 0 auto; padding: 56px 32px 96px; }
-
-    header.page { border-bottom: 1px solid var(--rule); padding-bottom: 28px; margin-bottom: 36px; }
-    .eyebrow {
-      font-family: "SF Mono", "JetBrains Mono", "IBM Plex Mono", Menlo, monospace;
-      font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase;
-      color: var(--ink-dim); margin: 0 0 10px;
-    }
-    h1 { font-size: 38px; line-height: 1.15; letter-spacing: -0.01em; margin: 0 0 14px; }
-    h2 { font-size: 26px; line-height: 1.2; letter-spacing: -0.005em; margin: 56px 0 16px;
-         border-top: 1px solid var(--rule); padding-top: 32px; }
-    h3 { font-size: 19px; line-height: 1.3; margin: 28px 0 10px; color: var(--accent); }
-    h4 {
-      font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase;
-      color: var(--ink-dim); margin: 22px 0 8px;
-      font-family: "SF Mono", "JetBrains Mono", "IBM Plex Mono", Menlo, monospace;
-      font-weight: 600;
-    }
-    p { margin: 0 0 14px; }
-    p.lede { font-size: 18px; line-height: 1.55; color: var(--ink-soft); }
-    em.term { font-style: normal; color: var(--accent); font-weight: 500; }
-
-    code, kbd, samp {
-      font-family: "SF Mono", "JetBrains Mono", "IBM Plex Mono", Menlo, monospace;
-      font-size: 0.86em; background: var(--code-bg); padding: 1px 5px;
-      border-radius: 3px; color: #2a2a2a;
-    }
-    pre {
-      background: var(--code-bg); padding: 14px 16px; border-radius: 6px;
-      overflow-x: auto; font-size: 13px; line-height: 1.5; margin: 14px 0;
-    }
-    pre code { background: transparent; padding: 0; font-size: 13px; }
-
-    /* Prism syntax highlighting — language-agnostic warm palette */
-    .token.comment                                  { color: #9a9388; font-style: italic; }
-    .token.keyword, .token.boolean, .token.nil,
-    .token.self                                     { color: #d6432e; font-weight: 600; }
-    .token.string, .token.regex, .token.char        { color: #b8881a; }
-    .token.symbol, .token.attr-name, .token.atrule  { color: #2e8a6b; font-weight: 600; }
-    .token.constant, .token.class-name, .token.tag  { color: #2476b8; font-weight: 600; }
-    .token.number                                   { color: #9a3fc4; }
-    .token.operator, .token.punctuation             { color: #6a6a6a; }
-    .token.method, .token.function, .token.variable,
-    .token.property                                 { color: #1a1a1a; }
-    .token.builtin, .token.important                { color: #e07820; font-weight: 600; }
-
-    /* Copy-to-clipboard button */
-    .copy-btn {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: var(--paper); border: 1px solid var(--rule);
-      color: var(--accent);
-      font-family: "SF Mono", "JetBrains Mono", "IBM Plex Mono", Menlo, monospace;
-      font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase;
-      padding: 5px 10px; border-radius: 4px; cursor: pointer;
-      font-weight: 600; transition: background 0.12s, border-color 0.12s, color 0.12s;
-    }
-    .copy-btn:hover { background: var(--accent-soft); border-color: var(--accent); }
-    .copy-btn.copied { background: var(--accent); color: var(--paper); border-color: var(--accent); }
-    .copy-btn::before { content: "⧉"; font-size: 12px; }
-    .copy-btn.copied::before { content: "✓"; }
-
-    .callout {
-      background: var(--accent-soft); border-left: 3px solid var(--accent);
-      padding: 18px 22px; border-radius: 4px; margin: 22px 0;
-    }
-    .callout p:last-child { margin-bottom: 0; }
-    .callout.warn { background: var(--warn-soft); border-left-color: var(--warn); }
-    .callout.bad  { background: var(--bad-soft);  border-left-color: var(--bad); }
-    .callout h4 { margin-top: 0; color: inherit; }
-
-    .meta {
-      display: flex; gap: 22px; flex-wrap: wrap;
-      color: var(--ink-dim); font-size: 13px;
-      font-family: "SF Mono", "JetBrains Mono", "IBM Plex Mono", Menlo, monospace;
-    }
-    .meta span strong { color: var(--ink-soft); font-weight: 500; }
-
-    .diagram {
-      background: var(--paper); border: 1px solid var(--rule); border-radius: 8px;
-      padding: 22px; margin: 18px 0 4px; box-shadow: var(--shadow);
-    }
-    .diagram .mermaid { background: transparent; text-align: center; }
-
-    /* Matrix table */
-    table.matrix {
-      width: 100%; border-collapse: collapse; margin: 16px 0;
-      background: var(--paper); box-shadow: var(--shadow);
-      border-radius: 6px; overflow: hidden;
-    }
-    table.matrix thead th {
-      background: #1a1a1a; color: #f1ede4;
-      font-family: "SF Mono", "JetBrains Mono", "IBM Plex Mono", Menlo, monospace;
-      font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
-      font-weight: 500; padding: 12px 14px; text-align: left;
-    }
-    table.matrix tbody td {
-      padding: 12px 14px; border-bottom: 1px solid var(--rule);
-      vertical-align: top; font-size: 14px; line-height: 1.5;
-    }
-    table.matrix tbody tr:last-child td { border-bottom: none; }
-    table.matrix td.criterion {
-      font-weight: 600; color: var(--ink); background: #fafaf7; width: 22%;
-    }
-
-    footer {
-      margin-top: 60px; padding-top: 22px; border-top: 1px solid var(--rule);
-      color: var(--ink-dim); font-size: 13px;
-      font-family: "SF Mono", "JetBrains Mono", "IBM Plex Mono", Menlo, monospace;
-    }
-
-    /* ===== Option-comparison specific ===== */
+    /* ===== Option-comparison specific (domain-only) ===== */
 
     /* Option grid layout */
     .option-grid {
@@ -327,7 +175,7 @@
 <body>
   <div class="wrap">
 
-    <header class="page">
+    <header class="page" id="top">
       <p class="eyebrow">{{EYEBROW e.g. "Design Options · TICKET-ID"}}</p>
       <h1>{{Topic}} — options compared</h1>
       <p class="lede">{{LEDE — one or two sentences explaining the decision point: what is being chosen, who has to live with it, and why now.}}</p>
@@ -605,52 +453,15 @@ end</code></pre>
 
   </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      if (window.Prism) { Prism.highlightAll(); }
+  <!-- Back-to-top (wired by core.js) -->
+  <a class="to-top" href="#top">Top</a>
 
-      // Copy-to-clipboard buttons
-      document.querySelectorAll('.copy-btn').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-          var text = btn.dataset.copyText;
-          if (!text && btn.dataset.copyTarget) {
-            var el = document.querySelector(btn.dataset.copyTarget);
-            if (el) text = el.innerText || el.value || '';
-          }
-          if (!text) return;
-          navigator.clipboard.writeText(text).then(function () {
-            btn.classList.add('copied');
-            var orig = btn.dataset.copyLabel || btn.textContent;
-            if (!btn.dataset.copyLabel) btn.dataset.copyLabel = orig.trim();
-            btn.textContent = 'Copied';
-            setTimeout(function () {
-              btn.classList.remove('copied');
-              btn.textContent = btn.dataset.copyLabel;
-            }, 1400);
-          });
-        });
-      });
-    });
+  <!-- Diagram zoom overlay (wired by core.js) -->
+  <div class="diagram-overlay" aria-hidden="true">
+    <button class="close" aria-label="Close">Close ✕</button>
+    <div class="inner"></div>
+  </div>
 
-    mermaid.initialize({
-      startOnLoad: true,
-      theme: 'base',
-      themeVariables: {
-        fontFamily: '"SF Mono", "JetBrains Mono", "IBM Plex Mono", Menlo, monospace',
-        fontSize: '13px',
-        primaryColor: '#e3ede9',
-        primaryTextColor: '#1a1a1a',
-        primaryBorderColor: '#2f5d50',
-        lineColor: '#8a8a8a',
-        secondaryColor: '#f1ede4',
-        tertiaryColor: '#ffffff',
-        noteBkgColor: '#fcecdc',
-        noteTextColor: '#4a4a4a',
-        noteBorderColor: '#e6e2d8',
-        clusterBkg: '#fafaf7',
-        clusterBorder: '#e6e2d8'
-      }
-    });
-  </script>
+  <!-- @core:js -->
 </body>
 </html>
