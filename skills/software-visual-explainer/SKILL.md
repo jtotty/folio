@@ -176,6 +176,21 @@ The brief is always "mix of technical explanations with code examples and non-te
 
 **Allow joyful flourishes.** Small interactive details that make the doc feel alive — a satisfying copy button, a working slider with live readout, a subtle hover state on a clickable element, a smooth state-transition animation — are encouraged when they serve the explanation. Don't decorate; do let the doc breathe.
 
+## Reading-first density rules
+
+- Lead the header with a `<p class="reading-meta">~N-min read · covers A, B, C</p>` so the reader
+  knows the shape before committing.
+- **No prose block exceeds ~5 lines** without a visual break or a transformation: lists → cards,
+  steps → numbered flow, endpoints/params → table. A wall of text is a bug.
+- **One concept per panel.** A vocab card, a callout, or a diagram covers exactly one idea.
+- Push optional depth into `<details class="collapsible">` so the *default* scroll stays short —
+  essentials visible, evidence on demand.
+- **Diagram node budget:** if a Mermaid diagram exceeds ~12 nodes, split it into a small overview
+  plus detail cards rather than one unreadable graph. Use `<br/>` (never `\n`) for label line breaks.
+- Mark any diagram the reader may want to inspect closely with `data-expandable` (click to zoom).
+- Caveats/citations go in Tufte sidenotes (`.sidenote-toggle` + `.sidenote`) — they float into the
+  margin on wide screens and collapse to tap-to-reveal on mobile, keeping the main column clean.
+
 ## Verification checklist (before declaring complete)
 
 - Every symbol in a code snippet exists in the codebase — confirm via Serena MCP (`find_symbol`) when available, else `git grep <symbol>`.
@@ -186,6 +201,14 @@ The brief is always "mix of technical explanations with code examples and non-te
 - No gradients, no emojis, no CSS framework utility classes (Bootstrap, Tailwind) unless explicitly requested.
 - The file renders standalone — open it in a browser, confirm all CDN scripts load, all diagrams render, all code blocks highlight in distinct token colors (not a single flat color), all interactive primitives work.
 - Mobile spot-check at 375px width: nothing overflows, all text remains readable.
+- Ran the build; the output opens correctly with networking disabled — diagrams are inline `<svg>`,
+  code is highlighted with distinct token colors, and no `cdnjs`/`jsdelivr` references remain. (Shiki
+  emits `class="shiki warm-paper"` and uppercase hex like `#D6432E`; match case-insensitively if you
+  script the check.)
+- Keyboard pass: Tab reaches every interactive element with a visible focus ring; tabs respond to
+  arrow keys; the diagram overlay closes on Escape.
+- Contrast: small mono labels use `--ink-label` (AA), not `--ink-dim`.
+- Print preview (Cmd-P) is clean: no diagram/table/callout splits mid-page; dark fills are outlined.
 
 **Brainstorm mode adds** (and relaxes the first four items above — they apply to *existing-code* references only):
 
@@ -193,6 +216,27 @@ The brief is always "mix of technical explanations with code examples and non-te
 - Existing-code references the brainstorm builds on are still verified normally (Serena MCP / `git grep`).
 - A divergent explainer ends in a "leaning toward" recommendation; a converged one states the chosen direction plainly in the meta-strip `status` field.
 - Every "Open questions" entry has a working copy button.
+
+## Build (offline self-contained output)
+
+The template references the shared design system via `<!-- @core:css -->` / `<!-- @core:js -->`
+markers, writes Mermaid as `.mermaid` blocks, and writes code as `<pre><code class="language-X">`.
+After filling in the content, run the build to produce a fully offline, self-contained file:
+
+    node "${CLAUDE_PLUGIN_ROOT}/skills/visual-explainer-core/build.mjs" path/to/your-explainer.html
+
+(When developing this skill outside the installed plugin, use the repo path to
+`skills/visual-explainer-core/build.mjs` instead — `${CLAUDE_PLUGIN_ROOT}` is only set inside an
+installed plugin.)
+
+The build inlines `core.css`/`core.js`, pre-renders every Mermaid diagram to inline SVG, highlights
+every code block via Shiki (inline styles), and strips the CDN tags. The result opens with **no
+network**. The first time, install the build's dependencies: run `npm install` once in
+`visual-explainer-core/` — this also fetches a headless Chromium for Mermaid (~150–200 MB, one-time;
+set `PUPPETEER_EXECUTABLE_PATH` to reuse a system Chrome).
+
+**Do not fork the palette.** All colors, fonts, and component styles live in `visual-explainer-core`.
+Never redefine `:root` tokens in a domain template; add only domain-specific components.
 
 ## Output file location
 

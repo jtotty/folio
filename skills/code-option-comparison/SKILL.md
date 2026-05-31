@@ -75,6 +75,35 @@ Every code snippet in every column gets a copy button (using the `.copy-btn` pri
 - The comparison axes actually differentiate (if every option scores the same on an axis, drop the axis).
 - The recommendation states a preference with reasoning, framed as a starting point not a verdict.
 - Renders standalone in a browser; columns line up; matrix is readable; copy buttons work.
+- Ran the build; the output opens correctly with networking disabled — diagrams are inline `<svg>`,
+  code is highlighted with distinct token colors, and no `cdnjs`/`jsdelivr` references remain. (Shiki
+  emits `class="shiki warm-paper"` and uppercase hex like `#D6432E`; match case-insensitively if you
+  script the check.)
+- Keyboard pass: Tab reaches every interactive element with a visible focus ring; tabs respond to
+  arrow keys; the diagram overlay closes on Escape.
+- Contrast: small mono labels use `--ink-label` (AA), not `--ink-dim`.
+- Print preview (Cmd-P) is clean: no diagram/table/callout splits mid-page; dark fills are outlined.
+
+## Build (offline self-contained output)
+
+The template references the shared design system via `<!-- @core:css -->` / `<!-- @core:js -->`
+markers, writes Mermaid as `.mermaid` blocks, and writes code as `<pre><code class="language-X">`.
+After filling in the content, run the build to produce a fully offline, self-contained file:
+
+    node "${CLAUDE_PLUGIN_ROOT}/skills/visual-explainer-core/build.mjs" path/to/your-explainer.html
+
+(When developing this skill outside the installed plugin, use the repo path to
+`skills/visual-explainer-core/build.mjs` instead — `${CLAUDE_PLUGIN_ROOT}` is only set inside an
+installed plugin.)
+
+The build inlines `core.css`/`core.js`, pre-renders every Mermaid diagram to inline SVG, highlights
+every code block via Shiki (inline styles), and strips the CDN tags. The result opens with **no
+network**. The first time, install the build's dependencies: run `npm install` once in
+`visual-explainer-core/` — this also fetches a headless Chromium for Mermaid (~150–200 MB, one-time;
+set `PUPPETEER_EXECUTABLE_PATH` to reuse a system Chrome).
+
+**Do not fork the palette.** All colors, fonts, and component styles live in `visual-explainer-core`.
+Never redefine `:root` tokens in a domain template; add only domain-specific components.
 
 ## Output file location
 
