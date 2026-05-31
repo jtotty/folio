@@ -23,9 +23,20 @@ skills/           one folder per skill, each with SKILL.md
 docs/plans/       implementation plans (e.g. the shared-core + offline-build refactor)
 ```
 
-## In progress
+## Shared core + offline build (shipped)
 
-The shared-core + offline-build refactor is planned in
-`docs/plans/2026-05-31-visual-explainer-shared-core.md`. When executed, the locked CSS/JS moves to a
-shared `skills/visual-explainer-core/`, and a `build.mjs` pre-renders Mermaid/code for offline output.
-Bundled scripts are referenced at runtime via `${CLAUDE_PLUGIN_ROOT}`.
+The shared-core + offline-build refactor is complete. Shared assets live at
+`skills/visual-explainer-core/` (`core.css`, `core.js`, `shiki-theme.json`). Skills reference the
+core via `<!-- @core:css -->` / `<!-- @core:js -->` markers in their `template.html`.
+
+To produce a fully offline artifact, run:
+
+    node "${CLAUDE_PLUGIN_ROOT}/skills/visual-explainer-core/build.mjs" path/to/your-file.html
+
+(Outside an installed plugin, substitute the repo-relative path to `build.mjs`.) Run `npm install`
+once in `skills/visual-explainer-core/` first — this also fetches a one-time headless Chromium for
+Mermaid pre-rendering (~150–200 MB; set `PUPPETEER_EXECUTABLE_PATH` to reuse a system Chrome).
+
+**`visual-explainer-core` is intentionally NOT listed in `.claude-plugin/plugin.json`'s `skills`
+array.** It is shared infrastructure and a contributor contract, not a user-facing explainer
+generator, so it is not surfaced as an installable `/folio:` command. Do not "fix" this omission.

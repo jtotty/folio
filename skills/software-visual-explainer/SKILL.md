@@ -23,7 +23,7 @@ Inputs are always software-related:
 
 The input is either a **written artifact** (a doc, a chunk of code) or **the conversation itself** (a brainstorm with no doc yet). The "Process" and "Content shape" sections below assume a written artifact; "Brainstorm explainer mode" covers the conversation case. The moment a brainstorm gets written to a spec, treat that spec as the written artifact.
 
-Output: **one self-contained HTML file by default**, typically at `docs/explainers/<topic>.html` or wherever the repo keeps narrative docs. For exploration topics with genuinely separate deliverables (e.g. brainstorm → multiple option write-ups → chosen plan), a linked web of HTML files is acceptable — each file is its own complete artifact. External resources (Mermaid, Prism.js) come from CDN; everything else is inlined.
+Output: **one fully self-contained HTML file by default**, typically at `docs/explainers/<topic>.html` or wherever the repo keeps narrative docs. For exploration topics with genuinely separate deliverables (e.g. brainstorm → multiple option write-ups → chosen plan), a linked web of HTML files is acceptable — each file is its own complete artifact. The build step inlines the shared core, pre-renders Mermaid to inline SVG, and highlights code via Shiki — no network required to open the output.
 
 ## When NOT to use
 
@@ -133,11 +133,10 @@ Three flavors, used together as needed:
 
 ## Code blocks
 
-- `<pre><code class="language-X">…</code></pre>` where `X` is the Prism language identifier: `ruby`, `python`, `typescript`, `javascript`, `jsx`, `tsx`, `go`, `rust`, `java`, `swift`, `kotlin`, `csharp`, `cpp`, `c`, `sql`, `bash`, `yaml`, `json`, `graphql`, `protobuf`, `erb`, `haml`, `elixir`, `clojure`, `scala`, `php`, etc.
-- The template loads Prism core via `https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js` with `data-manual`.
-- For each language you use, add a matching component: `https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-<lang>.min.js`. The template ships with a placeholder line — replace it (and add more) for the language(s) in this explainer.
-- An explicit `Prism.highlightAll()` runs on `DOMContentLoaded`.
-- The custom token palette (bright but warm — punchy red keywords, amber strings, teal symbols, blue constants, purple numbers, orange builtins) is in `template.html`. The token classes Prism emits are language-agnostic, so the same palette works across all languages without modification.
+- `<pre><code class="language-X">…</code></pre>` where `X` is the language id: `ruby`, `python`, `typescript`, `javascript`, `jsx`, `tsx`, `go`, `rust`, `java`, `swift`, `kotlin`, `csharp`, `cpp`, `c`, `sql`, `bash`, `yaml`, `json`, `graphql`, `protobuf`, `erb`, `haml`, `elixir`, `clojure`, `scala`, `php`, etc.
+- The build's **Shiki** step highlights every block offline, emitting inline styles using the warm token palette defined in `visual-explainer-core/shiki-theme.json` (a TextMate theme — punchy red keywords, amber strings, teal symbols, blue constants, purple numbers, orange builtins).
+- An alias map in the build handles ids that differ from Shiki's grammar names (e.g. `protobuf` → `proto`). An unknown or unsupported id falls back to plain text — no error, just no token coloring.
+- There are no CDN `<script>` tags and no runtime highlighting calls. Highlighting is entirely offline, done at build time by Shiki.
 
 **Use real code, not pseudocode.** The whole point of syntax highlighting is that the reader sees the exact symbols they'd find in the codebase. If a snippet needs trimming for the explainer, trim with `# ...` (or the equivalent comment syntax) rather than paraphrasing.
 
@@ -244,4 +243,4 @@ Ask the user, or default to a sensible location based on the repo layout (look f
 
 ## Template
 
-The full HTML skeleton with CSS palette tokens, component styles, Prism + Mermaid wiring, interactive primitives, and a section scaffold lives at `template.html` next to this `SKILL.md`. Start from a copy of that file and fill in the placeholders rather than rebuilding the styles from scratch.
+The full HTML skeleton with CSS palette tokens, component styles, interactive primitives, and a section scaffold lives at `template.html` next to this `SKILL.md`. The template references the shared core via `<!-- @core:css -->` / `<!-- @core:js -->` markers rather than containing inline CDN wiring. Start from a copy of that file and fill in the placeholders rather than rebuilding the styles from scratch.

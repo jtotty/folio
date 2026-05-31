@@ -33,7 +33,7 @@ Output: **one self-contained HTML file**, typically at `docs/comparisons/<topic>
 1. **Enumerate the options.** Either work from the user's list, or generate N distinct options yourself — explicitly vary the tradeoff each option is making (cost vs latency, simplicity vs flexibility, etc.). Each option must be distinct enough that the comparison is meaningful.
 2. **Define the comparison axes** — the same 4-8 questions you'll answer for every option. Examples: complexity to implement, ongoing maintenance cost, latency profile, failure modes, team familiarity, vendor lock-in, observability. Pick axes that actually differentiate the options.
 3. **Verify against the codebase** if any option is "what we have today" or "a small extension of what we have." Real symbols, real method names — same rule as `software-visual-explainer`.
-4. **Pick the syntax-highlighting language(s)** for any code snippets per column. Load matching Prism components.
+4. **Pick the syntax-highlighting language(s)** for any code snippets per column. The build highlights them via Shiki offline — no Prism components to load.
 5. **Draft using `template.html`** in this skill directory. Fill in N column blocks.
 6. **Self-review.** Each column should answer every axis. The comparison matrix at the bottom should let the reader see all options against all axes at once. Don't leave cells empty — write "n/a" or "doesn't apply" explicitly.
 7. **Offer to review.** Ask the user to spot-check. Note which option you'd recommend and why; the reader is choosing, not you.

@@ -53,19 +53,17 @@ visual walkthrough"*, or *"compare these 4 approaches side by side."*
   explanation they finish beats a 100% one they don't open.
 - **Real code, not pseudocode.** Snippets are verified against the source so the reader sees the exact
   symbols they'll find in the codebase.
-- **Self-contained output.** One HTML file. (Today: diagrams/highlighting load from CDN. Next: a build
-  step pre-renders everything for fully offline output — see [the plan](docs/plans/2026-05-31-visual-explainer-shared-core.md).)
+- **Self-contained output.** One fully offline HTML file. The build step pre-renders Mermaid diagrams to inline SVG, highlights code via Shiki inline, and inlines the shared core — no network required to open the result.
+
+## Shipped
+
+- Shared design system extracted to `skills/visual-explainer-core/` (CSS, JS, Shiki theme) — all skills inherit one identity with zero drift.
+- Offline-by-default build (`build.mjs`): Mermaid pre-rendered to inline SVG, code highlighted via Shiki inline, no CDN tags in the output.
+- Accessibility (WCAG-AA contrast, focus, keyboard), a print/Save-as-PDF stylesheet, and reading-first comprehension aids (scroll-spy, sidenotes, details-on-demand).
 
 ## Roadmap
 
-- Extract the locked visual system into a shared `visual-explainer-core` so every skill — and every
-  future domain — inherits one identity with zero drift.
-- Offline-by-default output: pre-render Mermaid → inline SVG and code → inline-styled highlighting.
-- Accessibility (WCAG-AA contrast, focus, keyboard), a print/Save-as-PDF stylesheet, and reading-first
-  comprehension aids (scroll-spy, sidenotes, details-on-demand).
 - New domains: `finance-visual-explainer`, `article-visual-explainer`.
-
-The full implementation plan lives in [`docs/plans/`](docs/plans/2026-05-31-visual-explainer-shared-core.md).
 
 ## License
 
