@@ -31,6 +31,7 @@ skills/
   visual-explainer-core/        shared design system (not a user-facing generator)
     SKILL.md
     assets/      core.css, core.js   ← canonical locked theme
+    scripts/     assemble.sh          ← stamps the core into a draft (zero install)
 ```
 
 **SKILL.md is an orchestrator, kept lean.** It carries when-to-use, the process spine, and a
@@ -38,18 +39,19 @@ reference map; everything else (content shapes, diagram/code detail, primitives,
 `references/*.md` and is pulled in only when needed. When adding guidance, put detail in a reference
 file and link it from SKILL.md — don't grow the always-loaded SKILL.md.
 
-## Shared core + CDN rendering (no build)
+## Shared core + one zero-install assembly step
 
-The locked theme lives once in `skills/visual-explainer-core/assets/` (`core.css`, `core.js`). Each
-domain `templates/template.html` is **fully self-contained**: it embeds an inline copy of that core
-and loads Mermaid + Prism from a CDN. There is **no build step** — fill in the template, replace
-`{{LANGUAGE}}` in the Prism `<script>` tag, and open the file in a browser. (CDN-dependent, so not
-offline; that's the deliberate trade for simplicity.)
+The locked theme lives **once** in `skills/visual-explainer-core/assets/` (`core.css`, `core.js`).
+Each domain `templates/template.html` is a **marker skeleton** — structure, component markup, the
+Mermaid + Prism CDN tags, and two markers (`<!-- @core:css -->` / `<!-- @core:js -->`). To produce an
+explainer: fill the draft, then run
+`bash skills/visual-explainer-core/scripts/assemble.sh <draft> <output.html>`, which stamps the
+canonical theme into the markers. Open the output in a browser. Zero install (awk/bash) — no Node, no
+toolchain; CDN-dependent at view time, so not offline (the deliberate trade for simplicity).
 
-`core.css`/`core.js` are the **canonical** copy; the templates' inline copies must match them. When
-you change the theme, edit the canonical files first, then paste the update into each template's
-`<style>` / `<script>`. This manual sync is the one discipline that keeps the family consistent —
-there is deliberately no build to automate it.
+`core.css`/`core.js` are the **only** copy — templates never embed the theme, so there is nothing to
+hand-sync and the family can't drift. Change the theme by editing the canonical files; every explainer
+assembled afterward picks it up. Never paste theme rules into a template.
 
 **`visual-explainer-core` is intentionally NOT listed in `.claude-plugin/plugin.json`'s `skills`
 array.** It is shared infrastructure and a contributor contract, not a user-facing explainer

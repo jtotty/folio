@@ -53,12 +53,12 @@ visual walkthrough"*, or *"compare these 4 approaches side by side."*
   explanation they finish beats a 100% one they don't open.
 - **Real code, not pseudocode.** Snippets are verified against the source so the reader sees the exact
   symbols they'll find in the codebase.
-- **Single-file output, no build.** One HTML file you just open in a browser — it embeds the shared theme and renders Mermaid diagrams + syntax-highlighted code from a CDN. Nothing to install.
+- **Single-file output, nothing to install.** Each explainer is one self-contained HTML file you just open in a browser — the shared theme is stamped in by a tiny zero-install shell step (awk/bash, no Node), and Mermaid diagrams + syntax-highlighted code render from a CDN.
 
 ## Shipped
 
-- Shared design system in `skills/visual-explainer-core/` (canonical `core.css` + `core.js`) — every skill embeds the same theme, so they can't drift.
-- Self-contained CDN templates: copy, fill in, open. Mermaid + Prism render in the browser with the locked theme — no build step, no Node.
+- Shared design system in `skills/visual-explainer-core/` (canonical `core.css` + `core.js`, plus a one-line `assemble.sh` splicer) — the theme lives in exactly one place and is stamped into every explainer, so they can't drift.
+- Marker-based templates: copy, fill in, run the zero-install splicer, open. Mermaid + Prism render in the browser with the locked theme — no toolchain, no Node.
 - Accessibility (WCAG-AA contrast, focus, keyboard), a print/Save-as-PDF stylesheet, and reading-first comprehension aids (scroll-spy, sidenotes, details-on-demand).
 
 ## Roadmap
