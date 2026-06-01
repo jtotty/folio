@@ -15,33 +15,37 @@ theme variation.
 
 ## What lives here
 
-`SKILL.md` at the root; the theme itself in `assets/`. There is **no build step** — diagrams and
-code render in the browser from a CDN.
+`SKILL.md` at the root; the theme in `assets/`; the splicer in `scripts/`.
 
 | Path | Responsibility |
 |---|---|
 | `assets/core.css` | All shared CSS: `:root` tokens, typography, primitives, the Prism code-token palette, a11y, print. |
 | `assets/core.js` | Copy buttons, tabs (+keyboard), sliders, TOC scroll-spy, back-to-top, diagram zoom — plus the locked `mermaid.initialize` and `Prism.highlightAll`. |
+| `scripts/assemble.sh` | Stamps `core.css`/`core.js` into a marker-based draft to produce the final HTML. Zero install (awk/bash); the only "build" there is. |
 
 ## How a domain skill uses the core
 
-Each domain `templates/template.html` is **fully self-contained**: it embeds an inline copy of
-`core.css` and `core.js`, and loads Mermaid + Prism from a CDN. To produce an explainer:
+Each domain `templates/template.html` is a **marker skeleton**: structure and component markup, the
+Mermaid + Prism CDN tags, and two markers — `<!-- @core:css -->` / `<!-- @core:js -->` — where the
+shared theme is stamped in. To produce an explainer:
 
-1. Start from `templates/template.html` (already self-contained — nothing to wire up).
+1. Copy `templates/template.html` to a working draft.
 2. Fill in content: Mermaid as `.mermaid` blocks, code as `<pre><code class="language-X">`. Replace
-   `{{LANGUAGE}}` in the Prism `<script>` tag with the language(s) the document uses.
-3. **Open the file in a browser.** Mermaid renders the diagrams and Prism highlights the code, both
-   from CDN. Nothing to install — no Node, no build. (Output needs a network connection to reach the
-   CDN; it is not offline-self-contained, by design.)
+   `{{LANGUAGE}}` in the Prism `<script>` tag (and the other `{{…}}` placeholders) with the document's
+   values.
+3. **Splice in the theme:** `bash scripts/assemble.sh <draft> <output.html>` — stamps the canonical
+   `core.css`/`core.js` into the markers. Zero install (awk/bash), no Node.
+4. **Open `<output.html>` in a browser.** The theme is now inlined; Mermaid + Prism load from CDN.
+   (Needs a network connection to reach the CDN; not offline-self-contained, by design.)
 
-## Keeping the theme in sync (canonical core)
+## One source of truth (no hand-sync)
 
-`assets/core.css` and `assets/core.js` are the **single canonical copy** of the locked theme; each
-template embeds an inline copy. There is deliberately no build to stamp it in automatically, so the
-sync is manual: **when you change the theme, edit `core.css`/`core.js` here first, then paste the
-updated content into each template's `<style>` / `<script>` block.** Edit the canonical files, never
-a template's copy in isolation — that is exactly the drift this core exists to prevent.
+`assets/core.css` and `assets/core.js` are the **only** copy of the locked theme. Templates don't
+embed it — they carry the `<!-- @core:css -->` / `<!-- @core:js -->` markers, and `assemble.sh` stamps
+the canonical files in at generation time. **Drift is impossible by construction:** to change the
+theme, edit `core.css`/`core.js` here and every explainer assembled afterward picks it up. Never paste
+the theme into a template — there is nothing to keep in sync, and a pasted copy is exactly the drift
+this core exists to prevent.
 
 ## The locked palette (do not change)
 

@@ -49,8 +49,10 @@ exclusions — see `references/content-shape.md`.
 3. **Pick the syntax-highlighting language(s).** Detect from the repo's file extensions, or ask. The
    template loads Prism from CDN — replace `{{LANGUAGE}}` in its `<script>` tag (duplicate the line
    for multiple languages). See `references/diagrams-and-code.md`.
-4. **Draft from `templates/template.html`.** Replace placeholders; preserve the locked palette, fonts,
-   and component styles. Structure per `references/content-shape.md`.
+4. **Draft from `templates/template.html`.** Copy it to a working draft and replace placeholders;
+   preserve the locked palette, fonts, and component styles. Structure per `references/content-shape.md`.
+   The draft carries `<!-- @core:* -->` markers, not the theme — `assemble.sh` stamps that in (see
+   Rendering).
 5. **Self-review against the codebase.** Map every snippet, state name, and named entity back to a
    real symbol. Fix discrepancies before showing the user.
 6. **Offer to review.** End by asking the user to spot-check; don't declare complete until they've seen
@@ -68,21 +70,27 @@ This SKILL.md is the orchestrator. Detail lives in the reference files — read 
 | The pre-completion checklist (accuracy, build, a11y, print, brainstorm) | [`references/verification.md`](references/verification.md) |
 | The HTML skeleton to start from | `templates/template.html` |
 
-## Rendering (CDN, no build)
+## Rendering (one zero-install step)
 
-`templates/template.html` is **fully self-contained**: it embeds the shared core and loads Mermaid +
-Prism from a CDN. There is **no build step**. Write `.mermaid` blocks and `<pre><code class="language-X">`,
-replace `{{LANGUAGE}}` in the Prism `<script>` tag with the language(s) used, and **open the file in a
-browser** — Mermaid renders the diagrams and Prism highlights the code. Nothing to install, no Node.
-(The page needs a network connection to reach the CDN; it is not offline-self-contained, by design.)
+`templates/template.html` is a **marker skeleton**, not the finished page: it has the structure, the
+component markup, the Mermaid + Prism CDN tags, and two markers — `<!-- @core:css -->` /
+`<!-- @core:js -->` — where the shared theme is stamped in. To produce the page:
 
-**Do not fork the palette.** The template's `<style>`/`<script>` are an inline copy of
-`visual-explainer-core`'s `core.css`/`core.js`. Never hand-edit the theme in one template — change the
-canonical `core.css`/`core.js` and re-sync (see that skill). Add only software-specific components in
-the template's own `<style>` block.
+1. Fill the draft: `.mermaid` blocks, `<pre><code class="language-X">`, and replace `{{LANGUAGE}}` in
+   the Prism `<script>` tag (plus the other `{{…}}` placeholders).
+2. Run `bash ${CLAUDE_PLUGIN_ROOT}/skills/visual-explainer-core/scripts/assemble.sh <draft> <output.html>`
+   — it inlines the canonical `core.css`/`core.js`. Zero install (awk/bash), no Node.
+3. **Open `<output.html>`** — Mermaid renders the diagrams, Prism highlights the code, both from CDN.
+   (Needs a network connection for the CDN; not offline-self-contained, by design.)
+
+**Do not fork the palette.** The theme is never stored in a template — `assemble.sh` stamps in the
+single canonical `core.css`/`core.js`. To change the theme, edit those canonical files (see
+`visual-explainer-core`); never paste theme rules into a template. Genuinely software-specific
+components go in the draft's own separate `<style>` block, not in the core.
 
 ## Output file location
 
 Ask the user, or default to a sensible spot based on the repo (an existing `docs/`, `notes/`, or
-`wiki/`; create `docs/explainers/` if nothing fits). Write the full HTML inline with the Write tool;
-keep the topic name kebab-case. Don't split a single explainer into multiple files.
+`wiki/`; create `docs/explainers/` if nothing fits). Write the filled draft with the Write tool, then
+`assemble.sh` it to the final `<topic>.html` (kebab-case) and remove the draft. Don't split a single
+explainer into multiple files.
